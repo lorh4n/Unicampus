@@ -1,0 +1,7 @@
+node_modules
+dist
+*.local
+.env
+
+# notas de trabalho internas — não fazem parte da entrega
+BUSINESS_RULES.md
