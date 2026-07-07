@@ -17,6 +17,23 @@ button, input, select { font-family: inherit; }
 .scrollarea { scrollbar-width: none; }
 .scrollarea::-webkit-scrollbar { width: 0; height: 0; }
 
+/* =========================== transições de tela =========================== */
+/* Cada tela (container) entra com fade + leve subida ao trocar de rota. */
+@keyframes screenIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.container, .container-narrow { animation: screenIn .34s cubic-bezier(.2,.7,.3,1) both; }
+.admin-content > *, .app-main > .container, .app-main > .container-narrow { will-change: transform, opacity; }
+
+/* Realce ao passar o mouse em cartões clicáveis (desktop). */
+.hover-lift { transition: transform .18s cubic-bezier(.2,.7,.3,1), box-shadow .18s ease; }
+@media (hover: hover) {
+  .hover-lift:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(20,20,45,0.14); }
+}
+.hover-lift:active { transform: scale(0.97); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+
 /* =========================== layout do app =========================== */
 
 .app-shell { display: flex; min-height: 100vh; }

@@ -31,8 +31,8 @@ export function Schedule() {
           <EmptyState
             title="Sem aulas na grade"
             subtitle="Cadastre os horários das suas disciplinas para montar a grade semanal."
-            actionLabel="Adicionar disciplina"
-            onAction={() => navigate('/app/disciplina/nova')}
+            actionLabel="Matricular-se"
+            onAction={() => navigate('/app/matricular')}
           />
         </div>
       ) : (

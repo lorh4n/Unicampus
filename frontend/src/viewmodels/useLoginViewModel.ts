@@ -21,8 +21,9 @@ export function useLoginViewModel() {
     try {
       const user = await login(ra, password, isDevMode ? { devRole } : undefined);
       return user.role;
-    } catch {
-      setError('Não foi possível entrar. Confira RA e senha.');
+    } catch (e) {
+      // mostra a mensagem do backend quando houver (ex.: "RA ou senha inválidos")
+      setError(e instanceof Error && e.message ? e.message : 'Não foi possível entrar. Confira RA e senha.');
       return null;
     } finally {
       setLoading(false);

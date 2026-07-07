@@ -1,17 +1,22 @@
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { GradeSimulator } from '../components/grade/GradeSimulator';
 import { AbsenceTracker } from '../components/grade/AbsenceTracker';
 import { Skeleton } from '../components/common/Skeleton';
 import { ErrorState } from '../components/common/States';
-import { IconBack, IconDots } from '../components/icons';
+import { BottomSheet } from '../components/common/BottomSheet';
+import { IconBack, IconChevronRight, IconLogout } from '../components/icons';
 import { courseGradient, courseSolid } from '../theme/tokens';
 import { fmtGrade, fmtPercent } from '../utils/format';
+import { useToast } from '../context/ToastContext';
 import { useCourseDetailViewModel } from '../viewmodels/useCourseDetailViewModel';
 
 export function CourseDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const vm = useCourseDetailViewModel(id);
+  const [confirmLeave, setConfirmLeave] = useState(false);
 
   if (vm.isLoading) {
     return (
@@ -65,10 +70,10 @@ export function CourseDetail() {
             <IconBack color="#fff" />
           </button>
           <button
-            className="pressable" aria-label="Editar disciplina" style={iconBtn}
-            onClick={() => navigate(`/app/disciplina/${c.id}/editar`)}
+            className="pressable" aria-label="Sair da disciplina" style={iconBtn}
+            onClick={() => setConfirmLeave(true)}
           >
-            <IconDots />
+            <IconLogout size={18} />
           </button>
         </div>
         <div style={{ marginTop: 16, position: 'relative', zIndex: 1 }}>
@@ -80,11 +85,25 @@ export function CourseDetail() {
           </h1>
           {(c.professor || c.className) && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 6, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.9)' }}>
-                {c.professor ? `Prof. ${c.professor}` : ''}
-                {c.professor && c.className ? ' · ' : ''}
-                {c.className ?? ''}
-              </span>
+              {c.professorId ? (
+                <button
+                  className="pressable"
+                  onClick={() => navigate(`/app/professor/${c.professorId}`)}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 4, border: 'none',
+                    background: 'transparent', color: 'rgba(255,255,255,0.95)', padding: 0,
+                    fontSize: 13, fontWeight: 700,
+                  }}
+                >
+                  Prof. {c.professor}
+                  <IconChevronRight color="rgba(255,255,255,0.8)" />
+                </button>
+              ) : (
+                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.9)' }}>
+                  {c.professor ? `Prof. ${c.professor}` : ''}
+                </span>
+              )}
+              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>{c.className ?? ''}</span>
               {c.professor && c.status === 'cursando' && (
                 <button
                   className="pressable"
@@ -167,13 +186,29 @@ export function CourseDetail() {
           <div style={{ fontSize: 16, fontWeight: 800, color: '#16153a', marginBottom: 12 }}>
             Controle de faltas
           </div>
-          <AbsenceTracker course={c} />
+          <AbsenceTracker course={c} onChangeSelf={vm.setSelfAbsences} saving={vm.savingSelfAbsences} />
         </div>
 
         <div className="detail-side">
           <GradeSimulator simulator={vm.simulator} />
         </div>
       </div>
+
+      <BottomSheet
+        open={confirmLeave}
+        icon={<IconLogout size={22} />}
+        danger
+        title="Sair da disciplina?"
+        subtitle={`${c.code} será removida das suas disciplinas e da grade.`}
+        confirmLabel="Sair"
+        onCancel={() => setConfirmLeave(false)}
+        onConfirm={async () => {
+          await vm.leaveCourse();
+          setConfirmLeave(false);
+          showToast('Você saiu da disciplina');
+          navigate('/app/inicio');
+        }}
+      />
     </div>
   );
 }

@@ -10,6 +10,7 @@ import type {
   Curriculum,
   OfferedCourse,
   Professor,
+  ProfessorProfile,
   SearchResult,
   Stats,
   Student,
@@ -44,14 +45,15 @@ export const httpRepositories: Repositories = {
   courses: {
     list: () => http.get<Course[]>('/courses?mine=true'),
     get: (id) => http.get<Course>(`/courses/${id}`),
-    create: (payload) => http.post<Course>('/courses', payload),
-    update: (id, payload) => http.put<Course>(`/courses/${id}`, payload),
     remove: (id) => http.delete<void>(`/courses/${id}`),
+    setSelfAbsences: (id, value) => http.put<Course>(`/courses/${id}/self-absences`, { value }),
   },
 
   enrollment: {
     getOfferings: () => http.get<OfferedCourse[]>('/offerings?semester=2026.1'),
     enroll: (codes) => http.post<Course[]>('/enrollments', { codes }),
+    getAvailableTurmas: () => http.get<Turma[]>('/enrollments/available'),
+    enrollInTurma: (turmaId, color) => http.post<Course>('/enrollments/turma', { turmaId, color }),
   },
 
   schedule: {
@@ -94,7 +96,11 @@ export const httpRepositories: Repositories = {
   professors: {
     list: () => http.get<Professor[]>('/professors'),
     get: (id) => http.get<Professor>(`/professors/${id}`),
+    getProfile: (id) => http.get<ProfessorProfile>(`/professors/${id}/profile`),
     rate: (payload) => http.post<Professor>(`/professors/${payload.professorId}/rate`, payload),
+    create: (payload) => http.post<Professor>('/professors', payload),
+    update: (id, payload) => http.put<Professor>(`/professors/${id}`, payload),
+    remove: (id) => http.delete<void>(`/professors/${id}`),
   },
 
   professorPortal: {

@@ -10,11 +10,12 @@ export function CourseCard({ course, onClick }: { course: Course; onClick: () =>
   const lowAttendance = course.attendance !== null && course.attendance < 80;
   return (
     <div
-      className="pressable"
+      className="hover-lift"
       role="button"
       aria-label={`${course.code} — ${course.name}`}
       onClick={onClick}
       style={{
+        cursor: 'pointer',
         width: '100%', height: 208, borderRadius: 22,
         background: courseGradient(course.color, 165),
         padding: 16, display: 'flex', flexDirection: 'column',

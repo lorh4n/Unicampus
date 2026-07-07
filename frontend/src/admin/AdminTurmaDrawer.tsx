@@ -8,6 +8,8 @@ import { IconClose } from '../components/icons';
 import { useAdminTurmaFormViewModel, type AdminSlotDraft } from '../viewmodels/adminTurmas';
 
 const HOURS = ['08:00', '10:00', '12:00', '14:00', '16:00', '19:00', '21:00'];
+// Salas sugeridas — quem cria a turma (Admin) define a sala; pode deixar em branco (remoto).
+const ROOMS = ['CB01', 'CB02', 'CB03', 'CB06', 'CB09', 'IC2 Sala 1', 'IC3 Auditório', 'Lab LSC', 'Lab LMC', 'IM02', 'PB Sala 3', 'IFGW', 'IEL 12'];
 const label: React.CSSProperties = { fontSize: 12.5, fontWeight: 800, color: '#56565e', marginBottom: 7 };
 const inputStyle: React.CSSProperties = {
   width: '100%', border: '1.5px solid #e4e4ea', borderRadius: 12, padding: '12px 13px',
@@ -128,16 +130,21 @@ export function AdminTurmaDrawer({ turma, onClose }: { turma: Turma | null; onCl
                   {HOURS.slice(1).map((h) => <option key={h}>{h}</option>)}
                 </select>
                 <input
-                  style={{ ...inputStyle, flex: 1, minWidth: 80, padding: 10 }} placeholder="Sala"
+                  style={{ ...inputStyle, flex: 1, minWidth: 80, padding: 10 }}
+                  placeholder="Sala (vazio = remoto)"
                   aria-label="Sala"
+                  list="turma-rooms"
                   value={slotDraft.room}
                   onChange={(e) => setSlotDraft((d) => ({ ...d, room: e.target.value }))}
                 />
+                <datalist id="turma-rooms">
+                  {ROOMS.map((r) => <option key={r} value={r} />)}
+                </datalist>
                 <button
                   className="pressable"
                   onClick={() => {
                     if (parseInt(slotDraft.end, 10) <= parseInt(slotDraft.start, 10)) return;
-                    vm.slots.add({ ...slotDraft, room: slotDraft.room.trim() || '—' });
+                    vm.slots.add({ ...slotDraft, room: slotDraft.room.trim() || 'Remoto' });
                     setShowSlotEditor(false);
                   }}
                   style={{ border: 'none', background: '#16153a', color: '#fff', fontWeight: 800, fontSize: 13, borderRadius: 12, padding: '10px 16px' }}

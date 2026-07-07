@@ -9,11 +9,13 @@ interface BottomSheetProps {
   danger?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
+  /** Conteúdo extra entre o subtítulo e os botões (ex.: color picker na matrícula). */
+  children?: ReactNode;
 }
 
 /** Bottom sheet de confirmação (SPEC §12.4): scrim + folha, Cancelar/Confirmar. */
 export function BottomSheet({
-  open, icon, title, subtitle, confirmLabel, danger, onConfirm, onCancel,
+  open, icon, title, subtitle, confirmLabel, danger, onConfirm, onCancel, children,
 }: BottomSheetProps) {
   if (!open) return null;
   return (
@@ -43,6 +45,7 @@ export function BottomSheet({
             {subtitle}
           </div>
         )}
+        {children && <div style={{ marginTop: 18 }}>{children}</div>}
         <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>
           <button className="btn-ghost pressable" onClick={onCancel}>
             Cancelar

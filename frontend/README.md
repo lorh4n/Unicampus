@@ -31,7 +31,7 @@ Três papéis, três dashboards, permissões diferentes:
 |---|---|---|
 | **Aluno** | `/app/*` | Ver notas/faltas/grade (só leitura), simular nota necessária, avaliar o professor da disciplina que cursa, ver integralização. |
 | **Professor** | `/professor/*` | Só as próprias turmas: define o PDD (critérios de avaliação), lança nota e falta dos alunos matriculados. Não vê o catálogo global. |
-| **Admin** (coordenação) | `/admin/*` | Catálogo de disciplinas, criação de turmas (aloca professor/horário/sala — **sem** PDD), listagem de professores (score só leitura) e alunos. |
+| **Admin** (coordenação) | `/admin/*` | O "pai de tudo": catálogo de disciplinas, criação de turmas (aloca professor/horário/sala — **sem** PDD), **cadastro/edição/remoção de professores** (score só leitura) e listagem de alunos. |
 
 O **papel vem do backend** no login/cadastro (`AuthSession.student.role`); o frontend só
 roteia para a área certa.
@@ -40,6 +40,11 @@ roteia para a área certa.
 
 - **Quem lança nota/falta:** só o professor da turma. O aluno só visualiza; o simulador de
   notas é uma calculadora local que nunca persiste.
+- **Contador pessoal de faltas do aluno (`selfAbsences`):** o aluno pode anotar as próprias
+  faltas enquanto o professor não lançou as oficiais. Não vira registro oficial; o risco de
+  frequência usa o **maior** entre oficial e pessoal.
+- **Matrícula:** o aluno se matricula numa **turma existente** (não cria disciplina). O
+  professor, o PDD e os horários vêm da turma; o aluno só escolhe a cor de identificação.
 - **Quem define o PDD (critérios de avaliação):** o **professor**, na própria turma — não o
   Admin. O Admin só aloca professor + horário + sala ao criar a turma.
 - **Avaliação de professores:** todo professor começa com nota **5,0** em cada critério
@@ -96,6 +101,9 @@ Trocar mock por HTTP é mexer só em `data/repositories/httpRepositories.ts` —
 | POST | `/enrollments` | `Course[]` |
 | GET | `/courses?mine=true`, `/courses/:id` | `Course[]`, `Course` |
 | POST / PUT / DELETE | `/courses`, `/courses/:id` | `Course` |
+| PUT | `/courses/:id/self-absences` | `Course` (contador pessoal de faltas do aluno) |
+| GET | `/enrollments/available` | `Turma[]` (turmas ofertadas não cursadas) |
+| POST | `/enrollments/turma` | `Course` (matrícula em turma: `{turmaId, color}`) |
 | GET | `/schedule` | `Course[]` (com `slots`) |
 | GET | `/curriculum` | `Curriculum` |
 | GET | `/stats` | `Stats` |
@@ -103,9 +111,11 @@ Trocar mock por HTTP é mexer só em `data/repositories/httpRepositories.ts` —
 | GET | `/search?q=&tab=` | `SearchResult[]` |
 | GET | `/admin/overview` | `AdminOverview` |
 | GET / POST / PUT / DELETE | `/admin/courses`, `/admin/courses/:id` | `AdminCourse` (catálogo — sem professor/horário) |
-| GET / POST / PUT / DELETE | `/admin/turmas`, `/admin/turmas/:id` | `Turma` (professor + horário; **sem PDD**) |
+| GET / POST / PUT / DELETE | `/admin/turmas`, `/admin/turmas/:id` | `Turma` (professor + horário/sala; **sem PDD**) |
 | GET | `/admin/students` | `AdminStudent[]` |
 | GET | `/professors`, `/professors/:id` | `Professor[]`, `Professor` |
+| GET | `/professors/:id/profile` | `ProfessorProfile` (score + turmas por semestre) |
+| POST / PUT / DELETE | `/professors`, `/professors/:id` | `Professor` (cadastro pelo Admin) |
 | POST | `/professors/:id/rate` | `Professor` (recalcula a média incremental) |
 | GET | `/professor/turmas`, `/professor/turmas/:id` | `Turma[]`, `Turma` (só as do professor logado) |
 | PUT | `/professor/turmas/:id/criteria` | `Turma` (professor define o PDD) |

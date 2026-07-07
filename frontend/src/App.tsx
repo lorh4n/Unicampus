@@ -24,8 +24,9 @@ import { Profile } from './screens/Profile';
 import { PersonalData } from './screens/PersonalData';
 import { AcademicInfo } from './screens/AcademicInfo';
 import { CourseDetail } from './screens/CourseDetail';
-import { CourseForm } from './screens/CourseForm';
+import { EnrollCourse } from './screens/EnrollCourse';
 import { RateProfessor } from './screens/RateProfessor';
+import { ProfessorProfileScreen } from './screens/ProfessorProfileScreen';
 import { CurriculumTree } from './screens/CurriculumTree';
 import { Notifications } from './screens/Notifications';
 import { Search } from './screens/Search';
@@ -89,10 +90,10 @@ export default function App() {
         <Route path="integralizacao" element={<CurriculumTree />} />
         <Route path="notificacoes" element={<Notifications />} />
         <Route path="busca" element={<Search />} />
-        <Route path="disciplina/nova" element={<CourseForm />} />
+        <Route path="matricular" element={<EnrollCourse />} />
         <Route path="disciplina/:id" element={<CourseDetail />} />
-        <Route path="disciplina/:id/editar" element={<CourseForm />} />
         <Route path="disciplina/:id/avaliar-professor" element={<RateProfessor />} />
+        <Route path="professor/:id" element={<ProfessorProfileScreen />} />
       </Route>
 
       {/* dashboard do professor — só as próprias turmas */}

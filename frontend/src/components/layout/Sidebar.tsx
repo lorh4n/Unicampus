@@ -54,10 +54,10 @@ export function Sidebar({ onLogout }: { onLogout: () => void }) {
         <button
           className="btn-primary pressable"
           style={{ marginTop: 14, padding: 14 }}
-          onClick={() => navigate('/app/disciplina/nova')}
+          onClick={() => navigate('/app/matricular')}
         >
           <IconPlus size={16} />
-          Adicionar disciplina
+          Matricular-se
         </button>
       </nav>
 

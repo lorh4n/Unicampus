@@ -7,9 +7,11 @@ import type {
   AppNotification,
   Course,
   CourseColor,
-  CoursePayload,
   Professor,
+  ProfessorPayload,
+  ProfessorProfile,
   ProfessorRatingPayload,
+  ProfessorTeaching,
   SearchResult,
   SearchTab,
   Student,
@@ -35,6 +37,8 @@ import {
 } from '../mock/seed';
 import { delay, loadCollection, saveCollection } from '../mock/store';
 import type { Repositories } from './types';
+
+const CURRENT_SEMESTER = '2026.1';
 
 const courses = {
   all: (): Course[] => loadCollection('courses', SEED_COURSES),
@@ -86,34 +90,26 @@ function adminCourseFromPayload(id: string, p: AdminCoursePayload, base?: AdminC
   };
 }
 
-function courseFromPayload(id: string, p: CoursePayload, base?: Course): Course {
+/** Cria a disciplina do aluno a partir de uma turma ofertada (matrícula). */
+function courseFromTurma(turma: Turma, color: CourseColor): Course {
   return {
-    id,
-    code: p.code,
-    name: p.name,
-    credits: p.credits,
-    color: p.color,
-    professor: p.professor,
-    className: base?.className,
-    status: base?.status ?? 'cursando',
-    average: base?.average ?? null,
-    attendance: base?.attendance ?? null,
-    absences: base?.absences ?? 0,
-    // limite de 25% da carga: créditos*15h de carga, aulas de 2h
-    absenceLimit: base?.absenceLimit ?? Math.max(2, Math.round((p.credits * 15 * 0.25) / 2)),
-    totalHours: base?.totalHours ?? p.credits * 15,
-    criteria: p.criteria.map((c, i) => {
-      const prev = base?.criteria.find((x) => x.label === c.label);
-      return {
-        id: prev?.id ?? `c${i + 1}-${Date.now()}`,
-        label: c.label,
-        weight: c.weight,
-        grade: prev?.grade ?? null,
-        date: prev?.date,
-        done: prev?.done ?? false,
-      };
-    }),
-    slots: p.slots.map((s, i) => ({ ...s, id: `s${i + 1}` })),
+    id: `c-${turma.id}-${Date.now()}`,
+    code: turma.courseCode,
+    name: turma.courseName,
+    credits: Math.round(turma.totalHours / 15),
+    color,
+    professor: turma.professorName,
+    professorId: turma.professorId,
+    className: turma.className,
+    status: 'cursando',
+    average: null,
+    attendance: null,
+    absences: 0,
+    selfAbsences: 0,
+    absenceLimit: turma.absenceLimit,
+    totalHours: turma.totalHours,
+    criteria: turma.criteria.map((c) => ({ ...c, grade: null, done: false })),
+    slots: turma.slots.map((s, i) => ({ ...s, id: `s${i + 1}` })),
   };
 }
 
@@ -255,26 +251,43 @@ export const mockRepositories: Repositories = {
       const found = courses.all().find((c) => c.id === id);
       return found ? delay(found) : Promise.reject(new Error('Disciplina não encontrada'));
     },
-    create(payload) {
-      const created = courseFromPayload(`c-${Date.now()}`, payload);
-      courses.save([...courses.all(), created]);
-      return delay(created, 500);
-    },
-    update(id, payload) {
-      const base = courses.all().find((c) => c.id === id);
-      const updated = courseFromPayload(id, payload, base);
-      courses.save(courses.all().map((c) => (c.id === id ? updated : c)));
-      return delay(updated, 500);
-    },
     remove(id) {
       courses.save(courses.all().filter((c) => c.id !== id));
       return delay(undefined, 350);
+    },
+    setSelfAbsences(id, value) {
+      const clamped = Math.max(0, value);
+      const list = courses.all().map((c) => (c.id === id ? { ...c, selfAbsences: clamped } : c));
+      courses.save(list);
+      const updated = list.find((c) => c.id === id);
+      return updated ? delay(updated, 150) : Promise.reject(new Error('Disciplina não encontrada'));
     },
   },
 
   enrollment: {
     getOfferings: () => delay([...SEED_OFFERINGS]),
     enroll: () => delay(courses.all(), 400),
+    getAvailableTurmas() {
+      const enrolledCodes = new Set(courses.all().map((c) => c.code));
+      return delay(turmas.all().filter((t) => t.status === 'ativa' && !enrolledCodes.has(t.courseCode)));
+    },
+    enrollInTurma(turmaId, color) {
+      const turma = turmas.all().find((t) => t.id === turmaId);
+      if (!turma) return Promise.reject(new Error('Turma não encontrada'));
+      const created = courseFromTurma(turma, color);
+      courses.save([...courses.all(), created]);
+      // adiciona a aluna ao roster da turma (demonstração)
+      const me = student.get();
+      const entry = {
+        id: `r-${Date.now()}`,
+        studentName: me.name,
+        studentRA: me.ra,
+        grades: Object.fromEntries(turma.criteria.map((c) => [c.id, null])),
+        absences: 0,
+      };
+      turmas.save(turmas.all().map((t) => (t.id === turmaId ? { ...t, roster: [...t.roster, entry] } : t)));
+      return delay(created, 500);
+    },
   },
 
   schedule: {
@@ -352,6 +365,24 @@ export const mockRepositories: Repositories = {
       const found = professors.all().find((p) => p.id === id);
       return found ? delay(found) : Promise.reject(new Error('Professor não encontrado'));
     },
+    getProfile(id): Promise<ProfessorProfile> {
+      const prof = professors.all().find((p) => p.id === id);
+      if (!prof) return Promise.reject(new Error('Professor não encontrado'));
+      // semestre atual: derivado das turmas ativas dele
+      const current: ProfessorTeaching[] = turmas
+        .all()
+        .filter((t) => t.professorId === id)
+        .map((t) => ({ semester: CURRENT_SEMESTER, courseCode: t.courseCode, courseName: t.courseName, className: t.className }));
+      // semestres anteriores: do histórico salvo, agrupados
+      const bySemester = new Map<string, ProfessorTeaching[]>();
+      for (const h of prof.history) {
+        bySemester.set(h.semester, [...(bySemester.get(h.semester) ?? []), h]);
+      }
+      const pastBySemester = [...bySemester.entries()]
+        .sort((a, b) => b[0].localeCompare(a[0]))
+        .map(([semester, items]) => ({ semester, items }));
+      return delay({ professor: prof, current, pastBySemester });
+    },
     rate(payload: ProfessorRatingPayload) {
       const list = professors.all();
       const prof = list.find((p) => p.id === payload.professorId);
@@ -370,6 +401,35 @@ export const mockRepositories: Repositories = {
       const updated = { ...prof, scores };
       professors.save(list.map((p) => (p.id === prof.id ? updated : p)));
       return delay(updated, 400);
+    },
+    create(payload: ProfessorPayload) {
+      const created: Professor = {
+        id: `prof-${Date.now()}`,
+        name: payload.name.trim(),
+        email: payload.email.trim(),
+        department: payload.department.trim(),
+        scores: { didactics: 5, organization: 5, accessibility: 5, material: 5, overall: 5, ratingsCount: 0 },
+        history: [],
+      };
+      professors.save([created, ...professors.all()]);
+      return delay(created, 500);
+    },
+    update(id, payload: ProfessorPayload) {
+      const list = professors.all();
+      const prof = list.find((p) => p.id === id);
+      if (!prof) return Promise.reject(new Error('Professor não encontrado'));
+      const updated: Professor = {
+        ...prof,
+        name: payload.name.trim(),
+        email: payload.email.trim(),
+        department: payload.department.trim(),
+      };
+      professors.save(list.map((p) => (p.id === id ? updated : p)));
+      return delay(updated, 500);
+    },
+    remove(id) {
+      professors.save(professors.all().filter((p) => p.id !== id));
+      return delay(undefined, 350);
     },
   },
 

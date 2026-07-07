@@ -53,11 +53,15 @@ export interface Course {
   credits: number;
   color: CourseColor;
   professor?: string;
+  professorId?: string; // vínculo com o perfil do professor (para avaliar/consultar)
   className?: string;
   status: CourseStatus;
   average: number | null;
   attendance: number | null;
+  /** Faltas oficiais lançadas pelo professor. */
   absences: number;
+  /** Controle pessoal do aluno — enquanto o professor não lança no sistema (BUSINESS_RULES.md §4.2). */
+  selfAbsences: number;
   absenceLimit: number;
   totalHours: number;
   criteria: GradeCriterion[];
@@ -129,16 +133,6 @@ export interface AuthSession {
   student: Student;
 }
 
-export interface CoursePayload {
-  code: string;
-  name: string;
-  credits: number;
-  color: CourseColor;
-  professor?: string;
-  criteria: Array<Pick<GradeCriterion, 'label' | 'weight'>>;
-  slots: Array<Omit<ClassSlot, 'id'>>;
-}
-
 // ---------------------------------------------------------------------------
 // Avaliação de professores (BUSINESS_RULES.md §4.4)
 // Todo professor começa com nota 5,0 em cada critério; a nota final é a média
@@ -154,12 +148,36 @@ export interface ProfessorScore {
   ratingsCount: number;   // quantas avaliações recebidas
 }
 
+/** Uma turma que o professor lecionou/leciona — usado no histórico do perfil. */
+export interface ProfessorTeaching {
+  semester: string;    // "2026.1"
+  courseCode: string;  // "MC322"
+  courseName: string;
+  className: string;   // "Turma A"
+}
+
 export interface Professor {
   id: string;
   name: string;
   email: string;
   department: string;
   scores: ProfessorScore;
+  /** Semestres anteriores lecionados (o semestre atual é derivado das turmas ativas). */
+  history: ProfessorTeaching[];
+}
+
+/** Perfil público consultável (busca → clique): professor + o que leciona por semestre. */
+export interface ProfessorProfile {
+  professor: Professor;
+  current: ProfessorTeaching[]; // semestre corrente (derivado das turmas ativas dele)
+  pastBySemester: Array<{ semester: string; items: ProfessorTeaching[] }>;
+}
+
+/** Admin cria/edita o cadastro de um professor (é o "pai de tudo"). */
+export interface ProfessorPayload {
+  name: string;
+  email: string;
+  department: string;
 }
 
 export interface ProfessorRatingPayload {

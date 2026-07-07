@@ -27,6 +27,16 @@ export class HttpError extends Error {
   }
 }
 
+/** Extrai a mensagem de erro do corpo `{ message }` que o backend devolve. */
+async function readErrorMessage(res: Response): Promise<string | null> {
+  try {
+    const body = (await res.json()) as { message?: unknown };
+    return typeof body.message === 'string' && body.message.length > 0 ? body.message : null;
+  } catch {
+    return null; // corpo vazio ou não-JSON
+  }
+}
+
 async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -42,12 +52,17 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
       signal: controller.signal,
     });
     if (res.status === 401) {
-      setToken(null);
-      window.dispatchEvent(new Event('unicampus:unauthorized'));
-      throw new HttpError(401, 'Sessão expirada — entre novamente.');
+      const message = await readErrorMessage(res);
+      // Só é "sessão expirada" se HAVIA sessão — um 401 no login é credencial errada.
+      if (token) {
+        setToken(null);
+        window.dispatchEvent(new Event('unicampus:unauthorized'));
+      }
+      throw new HttpError(401, message ?? 'Sessão expirada — entre novamente.');
     }
     if (!res.ok) {
-      throw new HttpError(res.status, `Erro ${res.status} ao chamar ${path}`);
+      const message = await readErrorMessage(res);
+      throw new HttpError(res.status, message ?? `Erro ${res.status} ao chamar ${path}`);
     }
     if (res.status === 204) return undefined as T;
     return (await res.json()) as T;

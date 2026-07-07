@@ -1,6 +1,7 @@
 // Score do professor — leitura apenas; quem avalia são os alunos (BUSINESS_RULES.md §4.4).
 import { ListSkeleton } from '../components/common/Skeleton';
 import { ErrorState } from '../components/common/States';
+import { CountUp } from '../components/common/CountUp';
 import { useMyScoreViewModel } from '../viewmodels/professor';
 
 const CRITERIA: Array<{ key: 'didactics' | 'organization' | 'accessibility' | 'material'; label: string }> = [
@@ -42,7 +43,7 @@ export function ProfessorScore() {
           MÉDIA GERAL
         </div>
         <div style={{ fontSize: 46, fontWeight: 800, color: '#FFC524', letterSpacing: '-0.02em', marginTop: 4 }}>
-          {p.scores.overall.toFixed(1)}
+          <CountUp value={p.scores.overall} decimals={1} comma />
         </div>
         <div style={{ fontSize: 12.5, color: '#b9b9d4', fontWeight: 500, marginTop: 4 }}>
           {p.scores.ratingsCount} avaliaç{p.scores.ratingsCount === 1 ? 'ão' : 'ões'} recebida{p.scores.ratingsCount === 1 ? '' : 's'}

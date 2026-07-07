@@ -40,11 +40,13 @@ export const SEED_COURSES: Course[] = [
     credits: 4,
     color: 'laranja',
     professor: 'Esther Colombini',
+    professorId: 'prof-colombini',
     className: 'Turma A',
     status: 'cursando',
     average: 7.8,
     attendance: 92,
     absences: 5,
+    selfAbsences: 5,
     absenceLimit: 8,
     totalHours: 60,
     criteria: [
@@ -65,11 +67,13 @@ export const SEED_COURSES: Course[] = [
     credits: 6,
     color: 'azul',
     professor: 'Carlos Ramos',
+    professorId: 'prof-ramos',
     className: 'Turma C',
     status: 'cursando',
     average: 4.6,
     attendance: 88,
     absences: 3,
+    selfAbsences: 4,
     absenceLimit: 11,
     totalHours: 90,
     criteria: [
@@ -89,11 +93,13 @@ export const SEED_COURSES: Course[] = [
     credits: 4,
     color: 'roxo',
     professor: 'Marina Lemos',
+    professorId: 'prof-lemos',
     className: 'Turma B',
     status: 'cursando',
     average: 6.5,
     attendance: 75,
     absences: 6,
+    selfAbsences: 6,
     absenceLimit: 8,
     totalHours: 60,
     criteria: [
@@ -113,11 +119,13 @@ export const SEED_COURSES: Course[] = [
     credits: 4,
     color: 'verde',
     professor: 'João Meidanis',
+    professorId: 'prof-meidanis',
     className: 'Turma A',
     status: 'cursando',
     average: 8.2,
     attendance: 96,
     absences: 1,
+    selfAbsences: 1,
     absenceLimit: 8,
     totalHours: 60,
     criteria: [
@@ -128,6 +136,58 @@ export const SEED_COURSES: Course[] = [
     slots: [
       { id: 's1', weekday: 2, start: '19:00', end: '21:00', room: 'CB09' },
       { id: 's2', weekday: 4, start: '19:00', end: '21:00', room: 'CB09' },
+    ],
+  },
+  {
+    id: 'mc404',
+    code: 'MC404',
+    name: 'Organização Básica de Computadores',
+    credits: 4,
+    color: 'rosa',
+    professor: 'Rodolfo Azevedo',
+    professorId: 'prof-azevedo',
+    className: 'Turma A',
+    status: 'cursando',
+    average: 7.0,
+    attendance: 90,
+    absences: 2,
+    selfAbsences: 2,
+    absenceLimit: 8,
+    totalHours: 60,
+    criteria: [
+      { id: 'c1', label: 'Prova P1', weight: 30, grade: 7.5, date: '09/04', done: true },
+      { id: 'c2', label: 'Prova P2', weight: 30, grade: null, date: '16/06', done: false },
+      { id: 'c3', label: 'Projeto', weight: 40, grade: 6.7, date: '02/06', done: true },
+    ],
+    slots: [
+      { id: 's1', weekday: 3, start: '14:00', end: '16:00', room: 'CB06' },
+      { id: 's2', weekday: 5, start: '14:00', end: '16:00', room: 'Lab LSC' },
+    ],
+  },
+  {
+    id: 'me323',
+    code: 'ME323',
+    name: 'Probabilidade e Estatística',
+    credits: 6,
+    color: 'laranja',
+    professor: 'Núbia Santos',
+    professorId: 'prof-santos',
+    className: 'Turma B',
+    status: 'cursando',
+    average: null,
+    attendance: 100,
+    absences: 0,
+    selfAbsences: 1,
+    absenceLimit: 11,
+    totalHours: 90,
+    criteria: [
+      { id: 'c1', label: 'Prova P1', weight: 30, grade: null, date: '15/04', done: false },
+      { id: 'c2', label: 'Prova P2', weight: 30, grade: null, date: '20/05', done: false },
+      { id: 'c3', label: 'Prova P3', weight: 40, grade: null, date: '26/06', done: false },
+    ],
+    slots: [
+      { id: 's1', weekday: 2, start: '08:00', end: '10:00', room: 'PB Sala 3' },
+      { id: 's2', weekday: 4, start: '08:00', end: '10:00', room: 'PB Sala 3' },
     ],
   },
 ];
@@ -280,15 +340,62 @@ const START_SCORE = (): Professor['scores'] => ({
   overall: 5.0, ratingsCount: 0,
 });
 
+const teach = (semester: string, courseCode: string, courseName: string, className: string): Professor['history'][number] =>
+  ({ semester, courseCode, courseName, className });
+
 export const SEED_PROFESSORS: Professor[] = [
-  { id: 'prof-colombini', name: 'Esther Colombini', email: 'esther@ic.unicamp.br', department: 'Instituto de Computação', scores: START_SCORE() },
-  { id: 'prof-ramos', name: 'Carlos Ramos', email: 'carlos.ramos@ime.unicamp.br', department: 'Instituto de Matemática', scores: START_SCORE() },
-  { id: 'prof-lemos', name: 'Marina Lemos', email: 'marina.lemos@ifi.unicamp.br', department: 'Instituto de Física', scores: START_SCORE() },
-  { id: 'prof-meidanis', name: 'João Meidanis', email: 'meidanis@ic.unicamp.br', department: 'Instituto de Computação', scores: START_SCORE() },
-  { id: 'prof-azevedo', name: 'Rodolfo Azevedo', email: 'rodolfo@ic.unicamp.br', department: 'Instituto de Computação', scores: START_SCORE() },
-  { id: 'prof-dias', name: 'Ana Dias', email: 'ana.dias@ime.unicamp.br', department: 'Instituto de Matemática', scores: START_SCORE() },
-  { id: 'prof-rezende', name: 'Pedro Rezende', email: 'rezende@ic.unicamp.br', department: 'Instituto de Computação', scores: START_SCORE() },
-  { id: 'prof-tavares', name: 'Luís Tavares', email: 'luis.tavares@fee.unicamp.br', department: 'Faculdade de Engenharia Elétrica', scores: START_SCORE() },
+  {
+    id: 'prof-colombini', name: 'Esther Colombini', email: 'esther@ic.unicamp.br',
+    department: 'Instituto de Computação', scores: START_SCORE(),
+    history: [
+      teach('2025.2', 'MC322', 'Programação Orientada a Objetos', 'Turma B'),
+      teach('2025.1', 'MC322', 'Programação Orientada a Objetos', 'Turma A'),
+      teach('2024.2', 'MC102', 'Algoritmos e Prog. de Computadores', 'Turma D'),
+    ],
+  },
+  {
+    id: 'prof-ramos', name: 'Carlos Ramos', email: 'carlos.ramos@ime.unicamp.br',
+    department: 'Instituto de Matemática', scores: START_SCORE(),
+    history: [
+      teach('2025.2', 'MA111', 'Cálculo I', 'Turma A'),
+      teach('2025.1', 'MA211', 'Cálculo II', 'Turma C'),
+    ],
+  },
+  {
+    id: 'prof-lemos', name: 'Marina Lemos', email: 'marina.lemos@ifi.unicamp.br',
+    department: 'Instituto de Física', scores: START_SCORE(),
+    history: [teach('2025.2', 'F 128', 'Física Geral I', 'Turma A')],
+  },
+  {
+    id: 'prof-meidanis', name: 'João Meidanis', email: 'meidanis@ic.unicamp.br',
+    department: 'Instituto de Computação', scores: START_SCORE(),
+    history: [
+      teach('2025.2', 'MC358', 'Projeto e Análise de Algoritmos', 'Turma B'),
+      teach('2025.1', 'MC458', 'Projeto e Análise de Algoritmos II', 'Turma A'),
+    ],
+  },
+  {
+    id: 'prof-azevedo', name: 'Rodolfo Azevedo', email: 'rodolfo@ic.unicamp.br',
+    department: 'Instituto de Computação', scores: START_SCORE(),
+    history: [teach('2025.1', 'MC404', 'Organização Básica de Computadores', 'Turma A')],
+  },
+  {
+    id: 'prof-santos', name: 'Núbia Santos', email: 'nubia.santos@ime.unicamp.br',
+    department: 'Instituto de Matemática', scores: START_SCORE(),
+    history: [teach('2025.2', 'ME323', 'Probabilidade e Estatística', 'Turma A')],
+  },
+  {
+    id: 'prof-dias', name: 'Ana Dias', email: 'ana.dias@ime.unicamp.br',
+    department: 'Instituto de Matemática', scores: START_SCORE(), history: [],
+  },
+  {
+    id: 'prof-rezende', name: 'Pedro Rezende', email: 'rezende@ic.unicamp.br',
+    department: 'Instituto de Computação', scores: START_SCORE(), history: [],
+  },
+  {
+    id: 'prof-tavares', name: 'Luís Tavares', email: 'luis.tavares@fee.unicamp.br',
+    department: 'Faculdade de Engenharia Elétrica', scores: START_SCORE(), history: [],
+  },
 ];
 
 export const SEED_ADMIN_COURSES: AdminCourse[] = [
@@ -300,6 +407,9 @@ export const SEED_ADMIN_COURSES: AdminCourse[] = [
   { id: 'ac6', code: 'MA311', name: 'Cálculo III', area: 'Matemática', credits: 4, color: 'laranja', classCount: 2, studentCount: 88, status: 'ativa' },
   { id: 'ac7', code: 'MC102', name: 'Algoritmos e Prog. de Computadores', area: 'Computação', credits: 6, color: 'azul', classCount: 5, studentCount: 312, status: 'ativa' },
   { id: 'ac8', code: 'EA513', name: 'Circuitos Elétricos', area: 'Engenharia', credits: 4, color: 'roxo', classCount: 2, studentCount: 76, status: 'rascunho' },
+  { id: 'ac9', code: 'ME323', name: 'Probabilidade e Estatística', area: 'Matemática', credits: 6, color: 'laranja', classCount: 3, studentCount: 140, status: 'ativa' },
+  { id: 'ac10', code: 'MC536', name: 'Bases de Dados', area: 'Computação', credits: 4, color: 'azul', classCount: 2, studentCount: 96, status: 'ativa' },
+  { id: 'ac11', code: 'LA122', name: 'Inglês Instrumental', area: 'Linguística', credits: 2, color: 'roxo', classCount: 6, studentCount: 180, status: 'ativa' },
 ];
 
 const crit = (label: string, weight: number, grade: number | null = null): GradeCriterion => ({
@@ -355,6 +465,61 @@ export const SEED_TURMAS: Turma[] = [
     roster: [
       { id: 'r1', studentName: 'Marina Alves', studentRA: '247195', grades: { 'prova-p1': 8.0, 'prova-p2': null, listas: 8.4 }, absences: 1 },
     ],
+    status: 'ativa',
+  },
+  {
+    id: 'turma-mc404-a',
+    courseCode: 'MC404', courseName: 'Organização Básica de Computadores', className: 'Turma A',
+    color: 'rosa', professorId: 'prof-azevedo', professorName: 'Rodolfo Azevedo',
+    slots: [
+      { id: 's1', weekday: 3, start: '14:00', end: '16:00', room: 'CB06' },
+      { id: 's2', weekday: 5, start: '14:00', end: '16:00', room: 'Lab LSC' },
+    ],
+    totalHours: 60, absenceLimit: 8,
+    criteria: [crit('Prova P1', 30, 7.5), crit('Prova P2', 30), crit('Projeto', 40, 6.7)],
+    roster: [
+      { id: 'r1', studentName: 'Marina Alves', studentRA: '247195', grades: { 'prova-p1': 7.5, 'prova-p2': null, projeto: 6.7 }, absences: 2 },
+      { id: 'r2', studentName: 'Elisa Nogueira', studentRA: '246650', grades: { 'prova-p1': 8.8, 'prova-p2': null, projeto: 9.0 }, absences: 0 },
+    ],
+    status: 'ativa',
+  },
+  {
+    id: 'turma-me323-b',
+    courseCode: 'ME323', courseName: 'Probabilidade e Estatística', className: 'Turma B',
+    color: 'laranja', professorId: 'prof-santos', professorName: 'Núbia Santos',
+    slots: [
+      { id: 's1', weekday: 2, start: '08:00', end: '10:00', room: 'PB Sala 3' },
+      { id: 's2', weekday: 4, start: '08:00', end: '10:00', room: 'PB Sala 3' },
+    ],
+    totalHours: 90, absenceLimit: 11,
+    criteria: [crit('Prova P1', 30), crit('Prova P2', 30), crit('Prova P3', 40)],
+    roster: [
+      { id: 'r1', studentName: 'Marina Alves', studentRA: '247195', grades: { 'prova-p1': null, 'prova-p2': null, 'prova-p3': null }, absences: 0 },
+    ],
+    status: 'ativa',
+  },
+  // Turmas ofertadas em que a Marina ainda NÃO está matriculada — aparecem em "Matricular-se".
+  {
+    id: 'turma-mc536-a',
+    courseCode: 'MC536', courseName: 'Bases de Dados', className: 'Turma A',
+    color: 'azul', professorId: 'prof-rezende', professorName: 'Pedro Rezende',
+    slots: [
+      { id: 's1', weekday: 1, start: '16:00', end: '18:00', room: 'CB03' },
+      { id: 's2', weekday: 3, start: '16:00', end: '18:00', room: 'CB03' },
+    ],
+    totalHours: 60, absenceLimit: 8,
+    criteria: [crit('Prova', 40), crit('Projeto de BD', 60)],
+    roster: [],
+    status: 'ativa',
+  },
+  {
+    id: 'turma-la122-e',
+    courseCode: 'LA122', courseName: 'Inglês Instrumental', className: 'Turma E',
+    color: 'roxo', professorId: 'prof-tavares', professorName: 'Luís Tavares',
+    slots: [{ id: 's1', weekday: 5, start: '10:00', end: '12:00', room: 'IEL 12' }],
+    totalHours: 30, absenceLimit: 4,
+    criteria: [crit('Participação', 40), crit('Prova final', 60)],
+    roster: [],
     status: 'ativa',
   },
 ];

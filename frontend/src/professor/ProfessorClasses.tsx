@@ -34,10 +34,10 @@ export function ProfessorClasses() {
         return (
           <div
             key={t.id}
-            className="admin-card pressable-row"
+            className="admin-card hover-lift float-in"
             role="button"
             onClick={() => navigate(`/professor/turmas/${t.id}`)}
-            style={{ padding: 20 }}
+            style={{ padding: 20, cursor: 'pointer', animationDelay: `${vm.turmas.indexOf(t) * 0.05}s` }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 13, marginBottom: 14 }}>
               <div

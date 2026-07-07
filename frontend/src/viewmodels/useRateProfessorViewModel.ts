@@ -14,7 +14,10 @@ export function useRateProfessorViewModel(courseId: string | undefined) {
     enabled: !!course.data?.professor,
   });
 
-  const professor = professorsQuery.data?.find((p) => p.name === course.data?.professor);
+  // casa por id (vínculo direto) e cai para o nome como fallback
+  const professor = professorsQuery.data?.find(
+    (p) => p.id === course.data?.professorId || p.name === course.data?.professor,
+  );
 
   const [didactics, setDidactics] = useState(4);
   const [organization, setOrganization] = useState(4);

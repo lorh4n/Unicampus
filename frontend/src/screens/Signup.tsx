@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { PrimaryButton } from '../components/common/PrimaryButton';
 import { ListSkeleton } from '../components/common/Skeleton';
-import { IconBack, IconCheck } from '../components/icons';
+import { IconBack, IconCheck, IconEye } from '../components/icons';
 import { useToast } from '../context/ToastContext';
 import { useSignupViewModel } from '../viewmodels/useSignupViewModel';
 
@@ -55,6 +55,37 @@ export function Signup() {
                 onChange={(e) => vm.setRa(e.target.value.replace(/\D/g, ''))}
               />
             </div>
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label className="field-label" htmlFor="su-senha" style={{ display: 'block' }}>Senha</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                id="su-senha"
+                className="input"
+                type={vm.showPassword ? 'text' : 'password'}
+                value={vm.password}
+                placeholder="Mínimo 6 caracteres"
+                style={{ paddingRight: 46, fontWeight: 700 }}
+                onChange={(e) => vm.setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className="pressable"
+                aria-label={vm.showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                onClick={vm.toggleShowPassword}
+                style={{
+                  position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)',
+                  border: 'none', background: 'transparent', padding: 0, display: 'flex',
+                }}
+              >
+                <IconEye color={vm.showPassword ? '#16153a' : '#9a9aa4'} />
+              </button>
+            </div>
+            {vm.passwordTooShort && (
+              <div style={{ fontSize: 11.5, fontWeight: 600, color: '#FF5A4D', marginTop: 4 }}>
+                A senha precisa de pelo menos 6 caracteres.
+              </div>
+            )}
           </div>
           <div style={{ marginBottom: 20 }}>
             <div className="field-label">Curso</div>

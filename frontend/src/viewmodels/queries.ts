@@ -2,7 +2,7 @@
 // Usadas pelos ViewModels — as Views não importam daqui.
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { repos } from '../data/repositories';
-import type { CoursePayload, SearchTab } from '../models';
+import type { SearchTab } from '../models';
 
 export function useMeQuery() {
   return useQuery({ queryKey: ['me'], queryFn: () => repos.student.getMe() });
@@ -45,18 +45,6 @@ export function useSearchQuery(q: string, tab: SearchTab) {
     queryKey: ['search', q, tab],
     queryFn: () => repos.search.query(q, tab),
     enabled: q.trim().length > 0,
-  });
-}
-
-export function useSaveCourseMutation(id?: string) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (payload: CoursePayload) =>
-      id ? repos.courses.update(id, payload) : repos.courses.create(payload),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['courses'] });
-      void qc.invalidateQueries({ queryKey: ['schedule'] });
-    },
   });
 }
 

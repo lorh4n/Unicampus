@@ -26,8 +26,13 @@ export function Search() {
 
   useEffect(() => inputRef.current?.focus(), []);
 
-  const openResult = (code: string) => {
-    const id = vm.courseIdFor(code);
+  const openResult = (r: { code: string; professorId?: string }) => {
+    // resultado de professor → perfil público; disciplina → detalhe (se matriculado)
+    if (r.professorId) {
+      navigate(`/app/professor/${r.professorId}`);
+      return;
+    }
+    const id = vm.courseIdFor(r.code);
     if (id) navigate(`/app/disciplina/${id}`);
   };
 
@@ -106,7 +111,7 @@ export function Search() {
                 key={`${r.code}-${i}`}
                 className="pressable-row float-in"
                 role="button"
-                onClick={() => openResult(r.code)}
+                onClick={() => openResult(r)}
                 style={{
                   background: '#fff', borderRadius: 18, padding: '13px 14px',
                   display: 'flex', alignItems: 'center', gap: 12,

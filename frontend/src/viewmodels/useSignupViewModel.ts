@@ -3,13 +3,18 @@ import { useMemo, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useOfferingsQuery } from './queries';
 
+const COURSE_NAME = 'Ciência da Computação';
+const COURSE_CODE = '42';
+const MIN_PASSWORD = 6;
+
 export function useSignupViewModel() {
   const { signup } = useAuth();
   const offerings = useOfferingsQuery();
 
   const [name, setName] = useState('');
   const [ra, setRa] = useState('');
-  const [course] = useState('Ciência da Computação · 42');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [enrolled, setEnrolled] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -24,11 +29,20 @@ export function useSignupViewModel() {
     setSaving(true);
     setError(null);
     try {
-      await signup({ name: name.trim(), ra: ra.trim(), course, enrolledCodes: enrolled });
+      await signup({
+        name: name.trim(),
+        ra: ra.trim(),
+        course: COURSE_NAME,
+        password,
+        enrolledCodes: enrolled,
+      });
       setSuccess(true);
       return true;
-    } catch {
-      setError('Não foi possível concluir o cadastro. Tente de novo.');
+    } catch (e) {
+      // mostra a mensagem do backend quando houver (ex.: RA já cadastrado)
+      setError(e instanceof Error && e.message
+        ? e.message
+        : 'Não foi possível concluir o cadastro. Tente de novo.');
       return false;
     } finally {
       setSaving(false);
@@ -38,7 +52,11 @@ export function useSignupViewModel() {
   return {
     name, setName,
     ra, setRa,
-    course,
+    password, setPassword,
+    showPassword,
+    toggleShowPassword: () => setShowPassword((v) => !v),
+    passwordTooShort: password.length > 0 && password.length < MIN_PASSWORD,
+    course: `${COURSE_NAME} · ${COURSE_CODE}`,
     offerings: offerings.data ?? [],
     offeringsLoading: offerings.isLoading,
     isSelected: (code: string) => enrolledSet.has(code),
@@ -46,7 +64,11 @@ export function useSignupViewModel() {
       setEnrolled((list) => (list.includes(code) ? list.filter((c) => c !== code) : [...list, code])),
     selectedCount: enrolled.length,
     selectedCredits: credits,
-    canSubmit: name.trim().length > 0 && ra.trim().length > 0 && enrolled.length > 0,
+    canSubmit:
+      name.trim().length > 0 &&
+      ra.trim().length > 0 &&
+      password.length >= MIN_PASSWORD &&
+      enrolled.length > 0,
     submit,
     saving,
     success,

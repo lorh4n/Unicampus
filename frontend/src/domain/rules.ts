@@ -12,23 +12,43 @@ export interface SimulatorResult {
 }
 
 /**
- * Nota necessária nas avaliações restantes para atingir a média 5,0:
- * needed = (M − Σ(wi·gi)) / wr — genérica para qualquer configuração de critérios.
+ * Média ponderada pelo PDD, considerando só os critérios cuja nota está no mapa `grades`.
+ * average = Σ(wi·gi) / Σ(wi). Retorna null se nenhum critério informado.
+ */
+export function weightedAverage(
+  criteria: GradeCriterion[],
+  grades: Record<string, number>,
+): number | null {
+  const scored = criteria.filter((c) => c.id in grades);
+  const totalWeight = scored.reduce((a, c) => a + c.weight, 0);
+  if (totalWeight === 0) return null;
+  const sum = scored.reduce((a, c) => a + c.weight * grades[c.id], 0);
+  return sum / totalWeight;
+}
+
+/**
+ * Nota necessária (uniforme) nas avaliações RESTANTES para fechar média 5,0,
+ * considerando as notas JÁ LANÇADAS (`launched`) e os pesos do PDD:
+ *   needed = (M·Σw − Σ(w_lançado·g)) / Σw_restante
+ * `launched` deve conter apenas notas reais (não simuladas).
  */
 export function computeNeeded(
   criteria: GradeCriterion[],
-  known: Record<string, number>,
+  launched: Record<string, number>,
 ): SimulatorResult | null {
-  const remaining = criteria.filter((c) => !(c.id in known));
+  const remaining = criteria.filter((c) => !(c.id in launched));
   if (remaining.length === 0) return null;
 
-  let acc = 0;
-  for (const c of criteria) {
-    if (c.id in known) acc += (c.weight / 100) * known[c.id];
-  }
-  const wr = remaining.reduce((a, c) => a + c.weight, 0) / 100;
-  if (wr <= 0) return null;
-  const raw = (PASSING_GRADE - acc) / wr;
+  const totalWeight = criteria.reduce((a, c) => a + c.weight, 0);
+  if (totalWeight <= 0) return null;
+
+  const launchedContribution = criteria
+    .filter((c) => c.id in launched)
+    .reduce((a, c) => a + c.weight * launched[c.id], 0);
+  const remainingWeight = remaining.reduce((a, c) => a + c.weight, 0);
+  if (remainingWeight <= 0) return null;
+
+  const raw = (PASSING_GRADE * totalWeight - launchedContribution) / remainingWeight;
 
   const targetLabel =
     remaining.length === 1 ? `na ${remaining[0].label.replace(/^Prova /, '')}` : 'nas restantes';

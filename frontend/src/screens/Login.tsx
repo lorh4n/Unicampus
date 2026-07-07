@@ -77,32 +77,29 @@ export function Login() {
 
         {/* Só no MODO DEV: simula o papel que o backend devolveria no login */}
         {vm.isDevMode && (
-          <div
-            style={{
-              marginTop: 14, padding: '10px 12px', borderRadius: 14,
-              background: '#16153a', display: 'flex', alignItems: 'center', gap: 10,
-            }}
-          >
-            <span style={{ fontSize: 11, fontWeight: 800, color: '#FFC524', letterSpacing: '0.04em' }}>
-              MODO DEV
-            </span>
-            <span style={{ fontSize: 12, fontWeight: 600, color: '#b9b9d4', flex: 1 }}>Entrar como</span>
-            {(['aluno', 'professor', 'admin'] as const).map((r) => (
-              <button
-                key={r}
-                type="button"
-                className="pressable"
-                onClick={() => vm.setDevRole(r)}
-                style={{
-                  border: 'none', borderRadius: 10, padding: '6px 10px',
-                  fontSize: 12, fontWeight: 800, textTransform: 'capitalize',
-                  background: vm.devRole === r ? '#FFC524' : 'rgba(255,255,255,0.1)',
-                  color: vm.devRole === r ? '#16153a' : '#b9b9d4',
-                }}
-              >
-                {r}
-              </button>
-            ))}
+          <div style={{ marginTop: 14, padding: '12px 12px 10px', borderRadius: 14, background: '#16153a' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              <span style={{ fontSize: 11, fontWeight: 800, color: '#FFC524', letterSpacing: '0.04em' }}>MODO DEV</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#b9b9d4' }}>· entrar como</span>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {(['aluno', 'professor', 'admin'] as const).map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  className="pressable"
+                  onClick={() => vm.setDevRole(r)}
+                  style={{
+                    flex: 1, border: 'none', borderRadius: 10, padding: '8px 6px',
+                    fontSize: 12, fontWeight: 800, textTransform: 'capitalize',
+                    background: vm.devRole === r ? '#FFC524' : 'rgba(255,255,255,0.1)',
+                    color: vm.devRole === r ? '#16153a' : '#b9b9d4',
+                  }}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 

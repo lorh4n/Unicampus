@@ -63,11 +63,11 @@ export function Drawer({ open, onClose, onLogout }: DrawerProps) {
               {item.label}
             </button>
           ))}
-          <button className="nav-item" onClick={() => go('/app/disciplina/nova')}>
+          <button className="nav-item" onClick={() => go('/app/matricular')}>
             <span className="nav-icon">
               <IconPlus size={15} />
             </span>
-            Adicionar disciplina
+            Matricular-se
           </button>
         </div>
 

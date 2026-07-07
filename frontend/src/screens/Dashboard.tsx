@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { CourseCard } from '../components/course/CourseCard';
+import { CountUp } from '../components/common/CountUp';
 import { DashboardSkeleton } from '../components/common/Skeleton';
 import { EmptyState, ErrorState } from '../components/common/States';
 import { IconBell, IconChevronRight, IconFlame, IconMenuGrid, IconPlus, IconSearch, IconWarn } from '../components/icons';
@@ -81,7 +82,7 @@ export function Dashboard() {
               <div style={{ flex: 1, background: '#16153a', borderRadius: 24, padding: '16px 18px', boxShadow: '0 10px 24px rgba(20,20,45,0.18)' }}>
                 <div style={{ fontSize: 12, color: '#a6a6c8', fontWeight: 600, letterSpacing: '0.02em' }}>CR atual</div>
                 <div style={{ fontSize: 34, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', lineHeight: 1.1, marginTop: 4 }}>
-                  {vm.student?.cr.toFixed(1)}
+                  {vm.student ? <CountUp value={vm.student.cr} decimals={1} comma /> : '—'}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
                   <span style={{ fontSize: 12, fontWeight: 700, color: '#7CE0A0' }}>
@@ -93,7 +94,7 @@ export function Dashboard() {
               <div className="card" style={{ flex: 1, borderRadius: 24, padding: '16px 18px' }}>
                 <div style={{ fontSize: 12, color: '#9a9aa4', fontWeight: 600, letterSpacing: '0.02em' }}>CP atual</div>
                 <div style={{ fontSize: 34, fontWeight: 800, color: '#16153a', letterSpacing: '-0.02em', lineHeight: 1.1, marginTop: 4 }}>
-                  {vm.student?.cp.toFixed(2)}
+                  {vm.student ? <CountUp value={vm.student.cp} decimals={2} comma /> : '—'}
                 </div>
                 <div style={{ fontSize: 11, color: '#9a9aa4', marginTop: 4 }}>
                   {vm.student?.creditsCompleted} / {vm.student?.creditsTotal} créditos
@@ -188,9 +189,9 @@ export function Dashboard() {
             <div className="container-narrow">
               <EmptyState
                 title="Nenhuma disciplina ainda"
-                subtitle="Adicione as matérias que você está cursando para acompanhar notas e faltas."
-                actionLabel="Adicionar disciplina"
-                onAction={() => navigate('/app/disciplina/nova')}
+                subtitle="Matricule-se nas turmas ofertadas para acompanhar notas e faltas."
+                actionLabel="Matricular-se"
+                onAction={() => navigate('/app/matricular')}
               />
             </div>
           ) : (
@@ -202,9 +203,9 @@ export function Dashboard() {
               </div>
 
               <div className="mobile-only" style={{ marginTop: 22 }}>
-                <button className="btn-primary pressable" onClick={() => navigate('/app/disciplina/nova')}>
+                <button className="btn-primary pressable" onClick={() => navigate('/app/matricular')}>
                   <IconPlus />
-                  Adicionar disciplina
+                  Matricular-se
                 </button>
               </div>
             </>

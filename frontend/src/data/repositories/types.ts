@@ -8,10 +8,11 @@ import type {
   AppNotification,
   AuthSession,
   Course,
-  CoursePayload,
   Curriculum,
   OfferedCourse,
   Professor,
+  ProfessorPayload,
+  ProfessorProfile,
   ProfessorRatingPayload,
   SearchResult,
   SearchTab,
@@ -27,6 +28,8 @@ export interface SignupPayload {
   name: string;
   ra: string;
   course: string;
+  /** Senha escolhida no cadastro — obrigatória com o backend real. */
+  password: string;
   enrolledCodes: string[];
 }
 
@@ -50,14 +53,19 @@ export interface StudentRepository {
 export interface CourseRepository {
   list(): Promise<Course[]>;
   get(id: string): Promise<Course>;
-  create(payload: CoursePayload): Promise<Course>;
-  update(id: string, payload: CoursePayload): Promise<Course>;
+  /** Trancar a matrícula (a criação agora é via EnrollmentRepository.enrollInTurma). */
   remove(id: string): Promise<void>;
+  /** Aluno atualiza o próprio contador pessoal de faltas (BUSINESS_RULES.md §4.2). */
+  setSelfAbsences(id: string, value: number): Promise<Course>;
 }
 
 export interface EnrollmentRepository {
   getOfferings(): Promise<OfferedCourse[]>;
   enroll(codes: string[]): Promise<Course[]>;
+  /** Turmas ofertadas em que o aluno ainda não está matriculado. */
+  getAvailableTurmas(): Promise<Turma[]>;
+  /** Matricula o aluno numa turma existente (professor/PDD/horário vêm da turma). */
+  enrollInTurma(turmaId: string, color: import('../../models').CourseColor): Promise<Course>;
 }
 
 export interface ScheduleRepository {
@@ -98,11 +106,18 @@ export interface AdminRepository {
   listStudents(): Promise<AdminStudent[]>;
 }
 
-/** Catálogo de professores (perfil + score) — lido pelo Admin e pela Busca; avaliado pelo Aluno. */
+/**
+ * Catálogo de professores. Leitura pública (Busca/perfil); avaliação pelo Aluno;
+ * cadastro (create/update/remove) só pelo Admin (BUSINESS_RULES.md §3).
+ */
 export interface ProfessorRepository {
   list(): Promise<Professor[]>;
   get(id: string): Promise<Professor>;
+  getProfile(id: string): Promise<ProfessorProfile>;
   rate(payload: ProfessorRatingPayload): Promise<Professor>;
+  create(payload: ProfessorPayload): Promise<Professor>;
+  update(id: string, payload: ProfessorPayload): Promise<Professor>;
+  remove(id: string): Promise<void>;
 }
 
 /** Dashboard do Professor: só as próprias turmas — PDD, roster, notas e faltas. */
