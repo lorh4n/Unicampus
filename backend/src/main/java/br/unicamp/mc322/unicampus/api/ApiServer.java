@@ -78,6 +78,10 @@ public class ApiServer {
             if (ctx.method() == HandlerType.OPTIONS || ctx.path().startsWith("/api/auth/")) {
                 return;
             }
+            // catálogo de oferecimentos é público: a tela de CADASTRO consulta antes do login
+            if (ctx.method() == HandlerType.GET && ctx.path().equals("/api/offerings")) {
+                return;
+            }
             String header = ctx.header("Authorization");
             String token = header != null && header.startsWith("Bearer ")
                     ? header.substring("Bearer ".length())
