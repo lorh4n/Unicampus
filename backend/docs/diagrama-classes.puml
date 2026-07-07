@@ -1,0 +1,195 @@
+@startuml diagrama-classes
+' Unicampus — backend MC322 (versão PlantUML para o relatório)
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+hide empty members
+
+' ===================== Interfaces =====================
+interface Identificavel {
+  +getId(): String
+}
+interface Avaliavel {
+  +receberAvaliacao(a: AvaliacaoProfessor)
+  +notaGeral(): double
+}
+interface GeradorDeAlerta {
+  +gerarAlertas(): List<Notificacao>
+}
+interface "Repositorio<T extends Identificavel>" as Repositorio {
+  +listar(): List<T>
+  +buscarPorId(id): Optional<T>
+  +filtrar(criterio): List<T>
+  +adicionar(t)
+  +remover(id)
+  +persistir()
+}
+
+' ===================== Pessoas =====================
+abstract class Pessoa {
+  -id: String
+  -name: String
+  -email: String
+  -ra: String
+  -senha: String
+  {abstract} +getPapel(): Papel
+  {abstract} +montarPerfilSessao(): PerfilSessao
+  +senhaConfere(tentativa): boolean
+}
+class Aluno {
+  -course: String
+  -semester: String
+  -cr: double
+  -cp: double
+}
+class Professor {
+  -department: String
+  -history: List<TurmaLecionada>
+  +receberAvaliacao(a)
+  +notaGeral(): double
+}
+class Coordenador {
+  -title: String
+  -department: String
+}
+class ScoreProfessor {
+  -didactics: double
+  -organization: double
+  -accessibility: double
+  -material: double
+  -overall: double
+  -ratingsCount: int
+  +incorporar(a: AvaliacaoProfessor)
+}
+enum Papel {
+  ALUNO
+  PROFESSOR
+  ADMIN
+}
+
+Identificavel <|.. Pessoa
+Pessoa <|-- Aluno
+Pessoa <|-- Professor
+Pessoa <|-- Coordenador
+Avaliavel <|.. Professor
+Professor *-- ScoreProfessor
+
+' ===================== Acadêmico =====================
+class Disciplina {
+  -code: String
+  -name: String
+  -area: String
+  -credits: int
+  -color: Cor
+  -status: StatusOferta
+  +cargaHoraria(): int
+}
+class Turma {
+  -courseCode: String
+  -className: String
+  -professorId: String
+  -totalHours: int
+  -absenceLimit: int
+  +definirCriterios(criterios)
+  +lancarNota(matriculaId, criterioId, nota)
+  +registrarFalta(matriculaId)
+  +matricular(aluno, cor): Matricula
+  +mediaDoAluno(m): Double
+  +gerarAlertas(): List<Notificacao>
+}
+class Matricula {
+  -studentId: String
+  -grades: Map<String, Double>
+  -absences: int
+  -selfAbsences: int
+  -color: Cor
+}
+class CriterioAvaliacao {
+  -label: String
+  -weight: int
+  -grade: Double
+  -done: boolean
+}
+class HorarioAula <<record>> {
+  +weekday: int
+  +start: String
+  +end: String
+  +room: String
+}
+class RegrasAcademicas <<utility>> {
+  {static} +mediaPonderada(criterios, notas): Double
+  {static} +notaNecessaria(criterios, notas): Double
+  {static} +mediaIncremental(media, total, nota): double
+  {static} +limiteDeFaltas(cargaHoraria): int
+}
+
+Identificavel <|.. Disciplina
+Identificavel <|.. Turma
+GeradorDeAlerta <|.. Turma
+Disciplina "1" o-- "0..*" Turma : agrega >
+Turma "1" *-- "0..*" Matricula : roster >
+Turma "1" *-- "1..*" CriterioAvaliacao : PDD >
+Turma "1" *-- "0..*" HorarioAula
+Turma ..> RegrasAcademicas : usa
+Aluno ..> Matricula : origina
+
+' ===================== Notificações =====================
+abstract class Notificacao {
+  -id: String
+  -ownerId: String
+  -title: String
+  -desc: String
+  -read: boolean
+  -createdAt: long
+  {abstract} +getKind(): String
+  +getGroup(): String
+  +getTime(): String
+}
+class NotificacaoFalta
+class NotificacaoNota
+class NotificacaoPrazo
+class NotificacaoSistema
+
+Identificavel <|.. Notificacao
+Notificacao <|-- NotificacaoFalta
+Notificacao <|-- NotificacaoNota
+Notificacao <|-- NotificacaoPrazo
+Notificacao <|-- NotificacaoSistema
+Turma ..> Notificacao : cria (alertas)
+
+' ===================== Exceções =====================
+class UnicampusException {
+  -statusHttp: int
+}
+class ValidacaoException
+class PesoInvalidoException
+class AvaliacaoNaoPermitidaException
+class MatriculaNaoEncontradaException
+class AutenticacaoException
+class AcessoNegadoException
+class RecursoNaoEncontradoException
+
+RuntimeException <|-- UnicampusException
+UnicampusException <|-- ValidacaoException
+ValidacaoException <|-- PesoInvalidoException
+UnicampusException <|-- AvaliacaoNaoPermitidaException
+UnicampusException <|-- MatriculaNaoEncontradaException
+UnicampusException <|-- AutenticacaoException
+UnicampusException <|-- AcessoNegadoException
+UnicampusException <|-- RecursoNaoEncontradoException
+
+' ===================== Persistência =====================
+class "RepositorioJson<T>" as RepositorioJson {
+  -arquivo: Path
+  -cache: List<T>
+}
+class BancoDeDados {
+  +alunos(): Repositorio<Aluno>
+  +professores(): Repositorio<Professor>
+  +turmas(): Repositorio<Turma>
+  +disciplinas(): Repositorio<Disciplina>
+  +notificacoes(): Repositorio<Notificacao>
+}
+Repositorio <|.. RepositorioJson
+BancoDeDados *-- RepositorioJson : um arquivo JSON\npor coleção
+
+@enduml

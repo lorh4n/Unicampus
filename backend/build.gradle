@@ -1,0 +1,46 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'br.unicamp.mc322'
+version = '1.0.0'
+
+java {
+    // Compila para Java 17 (compatível com as máquinas do IC), mesmo rodando em JDKs mais novos.
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Servidor HTTP leve (roteamento + JSON via Jackson)
+    implementation 'io.javalin:javalin:6.7.0'
+    // Serialização JSON — usada tanto na API quanto na persistência em arquivo
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
+    // Log simples no console
+    implementation 'org.slf4j:slf4j-simple:2.0.16'
+
+    testImplementation platform('org.junit:junit-bom:5.10.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+application {
+    mainClass = 'br.unicamp.mc322.unicampus.Main'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 17
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+    }
+}
