@@ -29,8 +29,36 @@ export function Login() {
           </p>
         </div>
 
+        {/* Seleção de papel: sempre visível. Serve para (a) UX — o usuário
+            diz o que espera acessar — e (b) uma checagem extra de segurança:
+            se o papel devolvido pelo backend não bater com a aba escolhida,
+            o ViewModel encerra a sessão e bloqueia o acesso. O papel real
+            NUNCA é decidido aqui — só o backend autentica e define o papel. */}
+        <div style={{ marginTop: 26 }}>
+          <label className="field-label" style={{ display: 'block', marginBottom: 8 }}>Entrar como</label>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {(['aluno', 'professor', 'admin'] as const).map((r) => (
+              <button
+                key={r}
+                type="button"
+                className="pressable"
+                onClick={() => vm.setRole(r)}
+                style={{
+                  flex: 1, borderRadius: 12, padding: '10px 6px',
+                  fontSize: 13, fontWeight: 800,
+                  border: vm.role === r ? '2px solid #16153a' : '1px solid #e4e4ea',
+                  background: vm.role === r ? '#16153a' : '#fff',
+                  color: vm.role === r ? '#fff' : '#8e8e98',
+                }}
+              >
+                {vm.roleLabels[r]}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <form
-          style={{ marginTop: 34, display: 'flex', flexDirection: 'column', gap: 14 }}
+          style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 14 }}
           onSubmit={(e) => {
             e.preventDefault();
             void submit();
@@ -75,31 +103,14 @@ export function Login() {
           <button type="submit" hidden />
         </form>
 
-        {/* Só no MODO DEV: simula o papel que o backend devolveria no login */}
+        {/* Só no MODO DEV: um selo indicando que a aba acima também está
+            simulando o papel que o backend devolveria no mock de login. */}
         {vm.isDevMode && (
-          <div style={{ marginTop: 14, padding: '12px 12px 10px', borderRadius: 14, background: '#16153a' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <span style={{ fontSize: 11, fontWeight: 800, color: '#FFC524', letterSpacing: '0.04em' }}>MODO DEV</span>
-              <span style={{ fontSize: 12, fontWeight: 600, color: '#b9b9d4' }}>· entrar como</span>
-            </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {(['aluno', 'professor', 'admin'] as const).map((r) => (
-                <button
-                  key={r}
-                  type="button"
-                  className="pressable"
-                  onClick={() => vm.setDevRole(r)}
-                  style={{
-                    flex: 1, border: 'none', borderRadius: 10, padding: '8px 6px',
-                    fontSize: 12, fontWeight: 800, textTransform: 'capitalize',
-                    background: vm.devRole === r ? '#FFC524' : 'rgba(255,255,255,0.1)',
-                    color: vm.devRole === r ? '#16153a' : '#b9b9d4',
-                  }}
-                >
-                  {r}
-                </button>
-              ))}
-            </div>
+          <div style={{ marginTop: 14, padding: '8px 12px', borderRadius: 10, background: '#16153a' }}>
+            <span style={{ fontSize: 11, fontWeight: 800, color: '#FFC524', letterSpacing: '0.04em' }}>MODO DEV</span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: '#b9b9d4', marginLeft: 6 }}>
+              · login simulado como {vm.roleLabels[vm.role]}
+            </span>
           </div>
         )}
 
