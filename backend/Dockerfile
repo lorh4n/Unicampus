@@ -1,11 +1,11 @@
 FROM eclipse-temurin:17-jdk-alpine AS build
 WORKDIR /app
-# Copia arquivos do Gradle
-COPY gradlew .
-COPY gradle gradle
-COPY build.gradle settings.gradle ./
+# Copia arquivos do Gradle (a partir da raiz do repositório)
+COPY backend/gradlew .
+COPY backend/gradle gradle
+COPY backend/build.gradle backend/settings.gradle ./
 # Copia código fonte
-COPY src src
+COPY backend/src src
 # Compila e empacota o app
 RUN ./gradlew installDist --no-daemon
 
