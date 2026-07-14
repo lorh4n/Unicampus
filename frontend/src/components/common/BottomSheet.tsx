@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import type { ReactNode } from 'react';
 
 interface BottomSheetProps {
@@ -18,7 +19,9 @@ export function BottomSheet({
   open, icon, title, subtitle, confirmLabel, danger, onConfirm, onCancel, children,
 }: BottomSheetProps) {
   if (!open) return null;
-  return (
+  // Portal no body: telas com will-change/transform viram containing block de
+  // position:fixed e desancoravam a folha do viewport (visível no mobile).
+  return createPortal(
     <>
       <div className="sheet-scrim" onClick={onCancel} />
       <div className="sheet">
@@ -64,6 +67,7 @@ export function BottomSheet({
           </button>
         </div>
       </div>
-    </>
+    </>,
+    document.body,
   );
 }
