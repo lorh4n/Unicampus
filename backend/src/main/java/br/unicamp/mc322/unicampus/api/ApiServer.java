@@ -54,9 +54,14 @@ public class ApiServer {
         Javalin app = Javalin.create(config -> {
             config.showJavalinBanner = false;
             config.jsonMapper(new JavalinJackson().updateMapper(Mapeadores::configurarApi));
-            // CORS liberado para o dev do Vite (5173) e demais origens de demonstração
+            // CORS seguro: permite apenas a URL do frontend em produção ou o Vite local
             config.bundledPlugins.enableCors(cors -> cors.addRule(regra -> {
-                regra.anyHost();
+                String frontendUrl = System.getenv("FRONTEND_URL");
+                if (frontendUrl != null && !frontendUrl.isBlank()) {
+                    regra.allowHost(frontendUrl);
+                } else {
+                    regra.allowHost("http://localhost:5173");
+                }
             }));
         });
 
