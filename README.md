@@ -39,8 +39,6 @@ App de gestão acadêmica da Unicamp com três papéis — **Aluno**, **Professo
 </p>
 </details>
 
-> Trailer e imagens gerados com [Remotion](https://remotion.dev) a partir de capturas
-> **reais** da aplicação rodando (frontend + backend) — fonte em [`video-apresentacao/`](video-apresentacao/).
 
 ## Rodando o sistema completo
 
