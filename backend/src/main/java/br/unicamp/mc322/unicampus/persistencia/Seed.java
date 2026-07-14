@@ -28,11 +28,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Carga inicial dos arquivos de dados — espelha o seed do frontend
- * ({@code frontend/src/data/mock/seed.ts}), com uma diferença importante:
- * aqui a FONTE DE VERDADE É ÚNICA. As disciplinas do aluno são derivadas das
- * turmas em que ele está matriculado (roster), então o seed inclui a turma de
- * F 128 que no mock do frontend só existia do lado do aluno.
+ * Carga inicial dos arquivos de dados, espelhando o seed do frontend
+ * (frontend/src/data/mock/seed.ts). As disciplinas do aluno são derivadas
+ * das turmas em que ele está matriculado.
  *
  * Senha de todos os usuários de demonstração: {@code 123456}.
  */
@@ -128,7 +126,7 @@ public final class Seed {
     }
 
     // ------------------------------------------------------------------
-    // Turmas — fonte única de verdade das notas/faltas
+    // Turmas (notas e faltas ficam aqui)
     // ------------------------------------------------------------------
 
     private static CriterioAvaliacao crit(String label, int weight, Double grade, String date) {
@@ -154,7 +152,7 @@ public final class Seed {
         }
         List<Turma> l = new ArrayList<>();
 
-        // MC322 · Turma A — Esther Colombini (conta de demonstração do professor)
+        // MC322 Turma A - Esther Colombini (conta de demonstração do professor)
         Turma mc322 = new Turma("turma-mc322-a", cat.get("MC322"), "Turma A",
                 "prof-colombini", "Esther Colombini",
                 List.of(slot("s1", 1, "08:00", "10:00", "CB02"),
@@ -176,7 +174,7 @@ public final class Seed {
                 notas(cMc322, 4.5, null, 5.0), 7, Cor.LARANJA));
         l.add(mc322);
 
-        // MA111 · Turma C — Carlos Ramos
+        // MA111 Turma C - Carlos Ramos
         Turma ma111 = new Turma("turma-ma111-c", cat.get("MA111"), "Turma C",
                 "prof-ramos", "Carlos Ramos",
                 List.of(slot("s1", 1, "14:00", "16:00", "IM02"),
@@ -195,7 +193,7 @@ public final class Seed {
                 notas(cMa111, 7.0, 6.5, null), 1, Cor.AZUL));
         l.add(ma111);
 
-        // F 128 · Turma B — Marina Lemos (no mock do frontend só existia do lado do aluno)
+        // F 128 Turma B - Marina Lemos
         Turma f128 = new Turma("turma-f128-b", cat.get("F 128"), "Turma B",
                 "prof-lemos", "Marina Lemos",
                 List.of(slot("s1", 2, "10:00", "12:00", "IFGW"),
@@ -212,7 +210,7 @@ public final class Seed {
                 notas(cF128, 8.1, null, 8.9), 1, Cor.ROXO));
         l.add(f128);
 
-        // MC358 · Turma A — João Meidanis
+        // MC358 Turma A - João Meidanis
         Turma mc358 = new Turma("turma-mc358-a", cat.get("MC358"), "Turma A",
                 "prof-meidanis", "João Meidanis",
                 List.of(slot("s1", 2, "19:00", "21:00", "CB09"),
@@ -227,7 +225,7 @@ public final class Seed {
                 notas(cMc358, 8.0, null, 8.4), 1, Cor.VERDE));
         l.add(mc358);
 
-        // MC404 · Turma A — Rodolfo Azevedo
+        // MC404 Turma A - Rodolfo Azevedo
         Turma mc404 = new Turma("turma-mc404-a", cat.get("MC404"), "Turma A",
                 "prof-azevedo", "Rodolfo Azevedo",
                 List.of(slot("s1", 3, "14:00", "16:00", "CB06"),
@@ -244,7 +242,7 @@ public final class Seed {
                 notas(cMc404, 8.8, null, 9.0), 0, Cor.ROSA));
         l.add(mc404);
 
-        // ME323 · Turma B — Núbia Santos
+        // ME323 Turma B - Núbia Santos
         Turma me323 = new Turma("turma-me323-b", cat.get("ME323"), "Turma B",
                 "prof-santos", "Núbia Santos",
                 List.of(slot("s1", 2, "08:00", "10:00", "PB Sala 3"),
@@ -261,7 +259,7 @@ public final class Seed {
         me323.getRoster().add(mMe323);
         l.add(me323);
 
-        // Turmas ofertadas SEM a Marina — aparecem em "Matricular-se em turma"
+        // Turmas em que a Marina não está matriculada; aparecem em "Matricular-se em turma"
         Turma mc536 = new Turma("turma-mc536-a", cat.get("MC536"), "Turma A",
                 "prof-rezende", "Pedro Rezende",
                 List.of(slot("s1", 1, "16:00", "18:00", "CB03"),

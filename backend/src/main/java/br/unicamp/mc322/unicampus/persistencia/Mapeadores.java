@@ -8,12 +8,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * Fábrica dos dois {@link ObjectMapper}s do sistema:
- * - {@link #persistencia()}: grava TUDO nos arquivos JSON (inclui a visão
+ * - {@link #persistencia()}: grava tudo nos arquivos JSON (inclui a visão
  *   {@code Interna}, ex.: senha);
- * - {@link #configurarApi(ObjectMapper)}: serializa só a visão {@code Publica}
- *   — campos sensíveis nunca saem pela rede.
+ * - {@link #configurarApi(ObjectMapper)}: serializa só a visão {@code Publica},
+ *   para que campos sensíveis não saiam pela rede.
  *
- * Ambos acessam os CAMPOS privados diretamente (e não getters), para que
+ * Ambos acessam os campos privados diretamente (e não getters), para que
  * getters calculados (ex.: {@code Notificacao.getTime()}) só entrem no JSON
  * quando anotados explicitamente com {@code @JsonProperty}.
  */

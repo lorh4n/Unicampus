@@ -24,10 +24,9 @@ import io.javalin.http.HandlerType;
 import io.javalin.json.JavalinJackson;
 
 /**
- * Camada HTTP (Javalin): traduz o contrato REST combinado com o frontend
- * (ver tabela em {@code frontend/README.md}) para chamadas aos serviços.
- * Nenhuma regra de negócio vive aqui — só roteamento, autenticação por token
- * Bearer, checagem de papel e tradução de exceções para status HTTP.
+ * Camada HTTP (Javalin) da API REST consumida pelo frontend. Faz apenas
+ * roteamento, autenticação por token Bearer, checagem de papel e tradução
+ * de exceções para status HTTP; as regras de negócio ficam nos serviços.
  */
 public class ApiServer {
 
@@ -78,7 +77,7 @@ public class ApiServer {
             if (ctx.method() == HandlerType.OPTIONS || ctx.path().startsWith("/api/auth/")) {
                 return;
             }
-            // catálogo de oferecimentos é público: a tela de CADASTRO consulta antes do login
+            // o catálogo de oferecimentos é público: a tela de cadastro consulta antes do login
             if (ctx.method() == HandlerType.GET && ctx.path().equals("/api/offerings")) {
                 return;
             }
@@ -91,7 +90,7 @@ public class ApiServer {
     }
 
     private void configurarErros(Javalin app) {
-        // Toda exceção de negócio conhece seu status HTTP (polimorfismo)
+        // cada exceção de negócio define seu próprio status HTTP
         app.exception(UnicampusException.class, (e, ctx) ->
                 ctx.status(e.getStatusHttp()).json(new Respostas.Mensagem(e.getMessage())));
         app.exception(Exception.class, (e, ctx) ->
@@ -127,7 +126,7 @@ public class ApiServer {
     // ------------------------------------------------------------------
 
     private void registrarRotas(Javalin app) {
-        app.get("/", ctx -> ctx.result("Unicampus API — MC322. Endpoints sob /api."));
+        app.get("/", ctx -> ctx.result("Unicampus API - MC322. Endpoints sob /api."));
 
         // ---- Autenticação -------------------------------------------------
         app.post("/api/auth/login", ctx ->

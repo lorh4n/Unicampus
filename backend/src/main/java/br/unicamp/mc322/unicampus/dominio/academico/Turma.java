@@ -19,19 +19,10 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Oferecimento de uma disciplina em um semestre — o coração do domínio.
- *
- * Relacionamentos (requisito do enunciado):
- * - AGREGADA por {@link Disciplina} (via {@code courseCode});
- * - COMPÕE as {@link Matricula}s (roster) e os {@link CriterioAvaliacao}s do
- *   PDD — nenhum dos dois existe fora da turma;
- * - ASSOCIA-SE ao {@code Professor} alocado pela coordenação;
- * - IMPLEMENTA {@link GeradorDeAlerta}: sabe verificar quem está perto do
- *   limite de faltas ou com média abaixo de 5,0 e gerar as notificações.
- *
- * Invariantes protegidas aqui (e não na API): o PDD deve somar 100%
- * ({@link PesoInvalidoException}) e só se lança nota/falta de quem está
- * matriculado ({@link MatriculaNaoEncontradaException}).
+ * Oferecimento de uma disciplina em um semestre. Contém as matrículas
+ * (roster) e os critérios de avaliação (PDD), que não existem fora da turma.
+ * O PDD deve somar 100% e notas/faltas só podem ser lançadas para alunos
+ * matriculados.
  */
 public class Turma implements Identificavel, GeradorDeAlerta {
 
@@ -71,12 +62,8 @@ public class Turma implements Identificavel, GeradorDeAlerta {
         this.status = status;
     }
 
-    // ------------------------------------------------------------------
-    // PDD — responsabilidade do PROFESSOR da turma (BUSINESS_RULES.md §4.3)
-    // ------------------------------------------------------------------
-
     /**
-     * Define/edita os critérios de avaliação. Valida que os pesos somam 100%
+     * Define os critérios de avaliação. Valida que os pesos somam 100%
      * e preserva as notas já lançadas de critérios que continuam existindo.
      */
     public void definirCriterios(List<CriterioAvaliacao> novos) {
@@ -92,10 +79,6 @@ public class Turma implements Identificavel, GeradorDeAlerta {
             }
         }
     }
-
-    // ------------------------------------------------------------------
-    // Notas e faltas — só o professor da turma (BUSINESS_RULES.md §4.2)
-    // ------------------------------------------------------------------
 
     /** Lança a nota de um aluno em um critério do PDD. */
     public Matricula lancarNota(String matriculaId, String criterionId, Double nota) {
@@ -121,10 +104,6 @@ public class Turma implements Identificavel, GeradorDeAlerta {
         m.registrarFalta();
         return m;
     }
-
-    // ------------------------------------------------------------------
-    // Matrículas
-    // ------------------------------------------------------------------
 
     /** Matricula um aluno nesta turma (com a cor de preferência dele). */
     public Matricula matricular(Aluno aluno, Cor corPreferida) {
@@ -167,13 +146,9 @@ public class Turma implements Identificavel, GeradorDeAlerta {
         return RegrasAcademicas.mediaPonderada(criteria, m.getGrades());
     }
 
-    // ------------------------------------------------------------------
-    // GeradorDeAlerta — polimorfismo em ação
-    // ------------------------------------------------------------------
-
     /**
-     * Varre o roster e gera alertas: falta quando restam ≤ 2 antes do limite,
-     * nota quando a média atual está abaixo de 5,0.
+     * Gera alertas de falta (quando restam 2 ou menos) e de nota
+     * (média abaixo de 5,0) para os alunos da turma.
      */
     @Override
     public List<Notificacao> gerarAlertas() {
@@ -194,10 +169,7 @@ public class Turma implements Identificavel, GeradorDeAlerta {
         return alertas;
     }
 
-    // ------------------------------------------------------------------
-    // Atualização pela coordenação (alocação — nunca PDD/roster)
-    // ------------------------------------------------------------------
-
+    // A coordenação só altera a alocação, nunca PDD ou roster.
     public void realocar(Disciplina disciplina, String className,
                          String professorId, String professorName, List<HorarioAula> slots) {
         this.courseCode = disciplina.getCode();
@@ -211,9 +183,7 @@ public class Turma implements Identificavel, GeradorDeAlerta {
         this.absenceLimit = RegrasAcademicas.limiteDeFaltas(this.totalHours);
     }
 
-    // ------------------------------------------------------------------
-    // Getters (contrato JSON: mesmos nomes do frontend)
-    // ------------------------------------------------------------------
+    // Getters com os mesmos nomes de campo usados no JSON do frontend.
 
     @Override
     public String getId() {
@@ -272,7 +242,7 @@ public class Turma implements Identificavel, GeradorDeAlerta {
         this.status = status;
     }
 
-    /** Map criterionId → nota para consultas de regra (média, nota necessária). */
+    /** Notas por critério, usadas nos cálculos de média e nota necessária. */
     public Map<String, Double> notasDe(String matriculaId) {
         return new LinkedHashMap<>(matriculaPorId(matriculaId).getGrades());
     }

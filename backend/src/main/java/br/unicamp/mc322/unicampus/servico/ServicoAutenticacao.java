@@ -19,8 +19,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Autenticação por token opaco (Bearer). O papel do usuário NUNCA vem do
- * cliente: é decidido aqui, polimorficamente, pelo tipo concreto de
+ * Autenticação por token opaco (Bearer). O papel do usuário nunca vem do
+ * cliente: é decidido aqui pelo tipo concreto de
  * {@link Pessoa} encontrado no login ({@code Aluno}, {@code Professor} ou
  * {@code Coordenador}).
  */

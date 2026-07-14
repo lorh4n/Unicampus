@@ -40,7 +40,7 @@ public class ServicoNotificacoes {
 
     /**
      * Registra um alerta gerado por um {@code GeradorDeAlerta}, evitando
-     * duplicar: se o dono já tem uma notificação NÃO LIDA com o mesmo título,
+     * duplicar: se o dono já tem uma notificação não lida com o mesmo título,
      * o novo alerta é descartado.
      */
     public void registrarSeInedita(Notificacao alerta) {

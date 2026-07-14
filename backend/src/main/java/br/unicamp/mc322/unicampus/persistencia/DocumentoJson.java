@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 
 /**
  * Persistência em arquivo JSON de um documento único (ex.: o currículo do
- * curso, as estatísticas do aluno) — mesmo ciclo de vida do
+ * curso, as estatísticas do aluno), com o mesmo ciclo de vida do
  * {@link RepositorioJson}, para objetos que não são coleções.
  */
 public class DocumentoJson<T> {

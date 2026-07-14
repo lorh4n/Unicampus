@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 
 /**
  * Árvore de integralização do curso ({@code Curriculum} no contrato).
- * Implementa a regra oficial: uma disciplina BLOQUEADA fica DISPONÍVEL quando
- * todos os pré-requisitos estão APROVADOS (BUSINESS_RULES.md §4.5).
+ * Uma disciplina bloqueada fica disponível quando todos os
+ * pré-requisitos estão aprovados.
  */
 public class Curriculo {
 
@@ -37,8 +37,8 @@ public class Curriculo {
     }
 
     /**
-     * Aplica a regra de integralização: destrava (BLOQUEADA → DISPONÍVEL) toda
-     * disciplina cujos pré-requisitos já estão todos APROVADOS.
+     * Aplica a regra de integralização: destrava toda disciplina cujos
+     * pré-requisitos já estão todos aprovados.
      */
     public void aplicarIntegralizacao() {
         Map<String, ItemCurriculo> porCodigo = courses.stream()

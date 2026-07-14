@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Casos de uso do PROFESSOR no portal dele: só as PRÓPRIAS turmas — define o
- * PDD, lança notas e registra faltas (BUSINESS_RULES.md §2, §4.2, §4.3).
+ * Casos de uso do professor no portal dele, restritos às próprias turmas:
+ * define o PDD, lança notas e registra faltas.
  * Depois de cada lançamento, a turma (um {@code GeradorDeAlerta}) é consultada
  * e os alertas do aluno afetado viram notificações persistidas.
  */
@@ -47,7 +47,7 @@ public class ServicoProfessorPortal {
     }
 
     /**
-     * Define/edita o PDD da própria turma. A validação "pesos somam 100%" é da
+     * Define o PDD da própria turma. A validação de que os pesos somam 100% é da
      * {@link Turma} (lança {@code PesoInvalidoException}); notas já lançadas em
      * critérios que continuam existindo (mesmo rótulo) são preservadas.
      */
@@ -98,7 +98,7 @@ public class ServicoProfessorPortal {
 
     /**
      * Consulta o {@code GeradorDeAlerta} da turma e persiste (sem duplicar) os
-     * alertas do aluno recém-afetado — é assim que o aluno fica sabendo de
+     * alertas do aluno recém-afetado; é assim que o aluno fica sabendo de
      * falta perto do limite ou média abaixo de 5,0.
      */
     private void emitirAlertasPara(Turma t, Matricula m) {

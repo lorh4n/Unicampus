@@ -7,10 +7,10 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
- * INTERFACE (requisito do enunciado) — contrato genérico de persistência de
- * uma coleção de entidades. A implementação {@link RepositorioJson} LÊ e
- * GRAVA os elementos em ARQUIVO (requisito de arquivos do enunciado); os
- * serviços dependem apenas deste contrato, nunca do formato de armazenamento.
+ * Contrato genérico de persistência de uma coleção de entidades.
+ * A implementação {@link RepositorioJson} lê e grava os elementos em arquivo;
+ * os serviços dependem apenas deste contrato, nunca do formato de
+ * armazenamento.
  */
 public interface Repositorio<T extends Identificavel> {
 

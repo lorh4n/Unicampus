@@ -19,7 +19,7 @@ repositories {
 dependencies {
     // Servidor HTTP leve (roteamento + JSON via Jackson)
     implementation 'io.javalin:javalin:6.7.0'
-    // Serialização JSON — usada tanto na API quanto na persistência em arquivo
+    // Serialização JSON, usada na API e na persistência em arquivo
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
     // Log simples no console
     implementation 'org.slf4j:slf4j-simple:2.0.16'

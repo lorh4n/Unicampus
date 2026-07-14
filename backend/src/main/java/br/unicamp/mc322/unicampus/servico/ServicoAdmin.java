@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Casos de uso da COORDENAÇÃO (Admin): catálogo de disciplinas, criação de
- * turmas (alocando professor/horário/sala — nunca o PDD, que é do professor),
+ * Casos de uso da coordenação (admin): catálogo de disciplinas, criação de
+ * turmas (alocando professor, horário e sala; o PDD é do professor),
  * cadastro de professores e visão geral. O feed de "atividade recente" é
  * alimentado pelos próprios serviços a cada operação relevante.
  */
@@ -132,7 +132,7 @@ public class ServicoAdmin {
     }
 
     // ------------------------------------------------------------------
-    // Turmas (alocação de professor/horário — sem PDD)
+    // Turmas (alocação de professor e horário; sem PDD)
     // ------------------------------------------------------------------
 
     public List<Turma> listarTurmas() {
@@ -189,7 +189,7 @@ public class ServicoAdmin {
     }
 
     // ------------------------------------------------------------------
-    // Professores (o Admin é o "pai de tudo": cadastra e gerencia)
+    // Professores (cadastro e gestão)
     // ------------------------------------------------------------------
 
     public Professor criarProfessor(Requisicoes.ProfessorCadastro p) {

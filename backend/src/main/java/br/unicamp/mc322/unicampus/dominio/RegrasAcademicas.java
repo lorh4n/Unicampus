@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Regras de negócio acadêmicas puras — espelho em Java de
+ * Regras de negócio acadêmicas puras, espelho em Java de
  * {@code frontend/src/domain/rules.ts}, cobertas pelos testes unitários.
  * O backend é a fonte oficial destas regras; o frontend apenas as replica
  * para dar feedback imediato na interface.
@@ -20,8 +20,8 @@ public final class RegrasAcademicas {
     }
 
     /**
-     * Média ponderada das notas já lançadas, normalizada pelos pesos conhecidos:
-     * Σ(peso_i × nota_i) / Σ(peso_i). Retorna {@code null} se nenhuma nota foi lançada.
+     * Média ponderada das notas já lançadas, normalizada pelos pesos
+     * conhecidos. Retorna {@code null} se nenhuma nota foi lançada.
      */
     public static Double mediaPonderada(List<CriterioAvaliacao> criterios, Map<String, Double> notas) {
         double somaPesos = 0;
@@ -40,8 +40,8 @@ public final class RegrasAcademicas {
     }
 
     /**
-     * Nota necessária nas avaliações restantes para atingir a média 5,0:
-     * needed = (M − Σ(peso_i × nota_i)) / peso_restante.
+     * Nota necessária nas avaliações restantes para atingir a média 5,0,
+     * considerando as notas e pesos já lançados.
      * Retorna {@code null} quando não há avaliações restantes.
      */
     public static Double notaNecessaria(List<CriterioAvaliacao> criterios, Map<String, Double> notasConhecidas) {

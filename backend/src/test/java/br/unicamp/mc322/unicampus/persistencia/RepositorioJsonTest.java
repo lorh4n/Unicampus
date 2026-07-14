@@ -21,8 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Requisito de ARQUIVOS do enunciado: o sistema grava e relê as entidades em
- * JSON — inclusive a hierarquia polimórfica de Notificacao e a senha (que só
+ * Persistência em arquivo: o sistema grava e relê as entidades em JSON,
+ * inclusive a hierarquia polimórfica de Notificacao e a senha (que só
  * aparece no arquivo, nunca na API).
  */
 class RepositorioJsonTest {
@@ -47,7 +47,7 @@ class RepositorioJsonTest {
         mc322.lancarNota(marina.getId(), "prova-p2", 6.5);
         repo.persistir();
 
-        // "reinicia o servidor": novo repositório lendo o MESMO arquivo
+        // "reinicia o servidor": novo repositório lendo o mesmo arquivo
         RepositorioJson<Turma> relido = new RepositorioJson<>(arquivo, Turma.class, mapper, List::of);
         assertEquals(totalAntes, relido.total());
         Turma mc322Relida = relido.buscarPorId("turma-mc322-a").orElseThrow();

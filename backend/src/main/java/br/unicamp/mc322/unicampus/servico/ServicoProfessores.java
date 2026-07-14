@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Catálogo público de professores: consulta (busca/perfil) e AVALIAÇÃO pelos
- * alunos. A regra de permissão (só avalia quem está cursando uma turma do
- * professor) vive aqui; o recálculo incremental vive no próprio
+ * Catálogo público de professores: consulta (busca/perfil) e avaliação
+ * pelos alunos. A regra de permissão (só avalia quem está cursando uma turma
+ * do professor) fica aqui; o recálculo incremental fica no próprio
  * {@code Professor} (interface {@code Avaliavel}).
  */
 public class ServicoProfessores {
@@ -64,9 +64,9 @@ public class ServicoProfessores {
     }
 
     /**
-     * Aluno avalia professor (BUSINESS_RULES.md §4.4). Permissão: precisa
-     * estar MATRICULADO (cursando) em uma turma ativa daquele professor —
-     * caso contrário, {@link AvaliacaoNaoPermitidaException}.
+     * Aluno avalia professor. Permissão: precisa estar matriculado
+     * (cursando) em uma turma ativa daquele professor; caso contrário,
+     * {@link AvaliacaoNaoPermitidaException}.
      */
     public Professor avaliar(Aluno aluno, Requisicoes.AvaliacaoEnvio payload) {
         Professor professor = porId(payload.professorId());

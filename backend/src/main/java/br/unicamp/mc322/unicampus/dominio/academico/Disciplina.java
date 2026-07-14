@@ -4,9 +4,9 @@ import br.unicamp.mc322.unicampus.dominio.Identificavel;
 
 /**
  * Disciplina do catálogo global, mantida pela coordenação ({@code AdminCourse}
- * no contrato — sem professor/horário/PDD, que pertencem à {@link Turma}).
- * AGREGAÇÃO: uma disciplina agrega N turmas (as turmas referenciam o código da
- * disciplina, mas têm ciclo de vida próprio).
+ * no contrato; professor, horário e PDD pertencem à {@link Turma}).
+ * Uma disciplina agrega N turmas: as turmas referenciam o código da
+ * disciplina, mas têm ciclo de vida próprio.
  */
 public class Disciplina implements Identificavel {
 

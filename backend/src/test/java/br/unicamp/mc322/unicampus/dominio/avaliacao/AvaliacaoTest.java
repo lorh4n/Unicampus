@@ -10,7 +10,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/** Avaliação de professores: média incremental e validação (§4.4). */
+/** Avaliação de professores: média incremental e validação. */
 class AvaliacaoTest {
 
     private Professor novoProfessor() {
@@ -40,7 +40,7 @@ class AvaliacaoTest {
         assertEquals(1, p.getScores().getRatingsCount());
         assertEquals((4.0 + 3.0 + 5.0 + 4.0) / 4, p.getScores().getOverall(), 0.001);
 
-        // 2ª avaliação: novaMedia = (média × 1 + nota) / 2
+        // 2ª avaliação: novaMedia = (média * 1 + nota) / 2
         p.receberAvaliacao(new AvaliacaoProfessor("prof-1", 2.0, 5.0, 5.0, 2.0));
         assertEquals(3.0, p.getScores().getDidactics(), 0.001);   // (4+2)/2
         assertEquals(4.0, p.getScores().getOrganization(), 0.001); // (3+5)/2

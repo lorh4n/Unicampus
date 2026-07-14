@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
 /**
- * Corpos de resposta da API — espelham os modelos de
+ * Corpos de resposta da API, espelhando os modelos de
  * {@code frontend/src/models/index.ts} (mesmos nomes de campo).
  */
 public final class Respostas {

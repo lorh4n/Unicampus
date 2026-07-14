@@ -3,8 +3,8 @@ package br.unicamp.mc322.unicampus.dominio.avaliacao;
 import br.unicamp.mc322.unicampus.dominio.excecao.ValidacaoException;
 
 /**
- * Avaliação enviada por um aluno para um professor: nota de 0 a 5 em cada um
- * dos quatro critérios (BUSINESS_RULES.md §4.4).
+ * Avaliação enviada por um aluno para um professor: nota de 0 a 5 em
+ * cada um dos quatro critérios.
  */
 public record AvaliacaoProfessor(
         String professorId,

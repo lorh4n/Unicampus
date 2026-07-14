@@ -3,10 +3,10 @@ package br.unicamp.mc322.unicampus.dominio.avaliacao;
 import br.unicamp.mc322.unicampus.dominio.RegrasAcademicas;
 
 /**
- * Placar de avaliação de um professor (BUSINESS_RULES.md §4.4).
- * Todo professor começa com 5,0 em cada critério; cada avaliação recebida
- * atualiza as médias de forma INCREMENTAL (sem guardar as notas individuais):
- * novaMedia = (mediaAtual × total + notaDoAluno) / (total + 1).
+ * Placar de avaliação de um professor. Todo professor começa com 5,0 em
+ * cada critério; cada avaliação recebida atualiza as médias de forma
+ * incremental (sem guardar as notas individuais):
+ * novaMedia = (mediaAtual * total + notaDoAluno) / (total + 1).
  */
 public class ScoreProfessor {
 

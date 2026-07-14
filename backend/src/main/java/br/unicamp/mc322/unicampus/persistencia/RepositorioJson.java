@@ -15,13 +15,13 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
- * Implementação de {@link Repositorio} que persiste a coleção em um ARQUIVO
- * JSON (requisito de leitura/gravação em arquivo do enunciado).
+ * Implementação de {@link Repositorio} que persiste a coleção em um
+ * arquivo JSON.
  *
- * Ciclo de vida: no construtor, LÊ o arquivo se existir (senão, grava a carga
+ * Ciclo de vida: no construtor, lê o arquivo se existir (senão, grava a carga
  * inicial fornecida pelo {@code seed}); depois disso, toda mutação chama
- * {@link #persistir()} e regrava o arquivo — o estado sobrevive a reinícios
- * do servidor.
+ * {@link #persistir()} e regrava o arquivo, então o estado sobrevive a
+ * reinícios do servidor.
  */
 public class RepositorioJson<T extends Identificavel> implements Repositorio<T> {
 
@@ -54,7 +54,7 @@ public class RepositorioJson<T extends Identificavel> implements Repositorio<T> 
     public void persistir() {
         try {
             Files.createDirectories(arquivo.getParent());
-            // writerFor(tipoLista): serializa pelo tipo DECLARADO (a classe base),
+            // writerFor(tipoLista): serializa pelo tipo declarado (a classe base),
             // garantindo o discriminador polimórfico (ex.: "kind" das notificações)
             mapper.writerFor(tipoLista).withDefaultPrettyPrinter()
                     .writeValue(arquivo.toFile(), cache);

@@ -3,7 +3,7 @@ package br.unicamp.mc322.unicampus.dominio.pessoa;
 /**
  * Especialização de {@link Pessoa}: coordenação de curso ("Admin" no frontend).
  * Gerencia o catálogo de disciplinas, cria turmas (alocando professor, horário
- * e sala) e cadastra professores — mas NÃO lança nota/falta (isso é do
+ * e sala) e cadastra professores. Não lança nota/falta (isso é do
  * professor da turma) nem avalia professores (isso é dos alunos).
  */
 public class Coordenador extends Pessoa {

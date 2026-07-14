@@ -17,8 +17,8 @@ import java.nio.file.Path;
  * Agrega todos os repositórios do sistema, cada um persistido em seu próprio
  * arquivo JSON dentro do diretório de dados. Na primeira execução os arquivos
  * são criados a partir do {@link Seed}; depois disso, o que vale é o que está
- * gravado em disco (o sistema LÊ os elementos ao iniciar e GRAVA a cada
- * alteração — requisito de arquivos do enunciado).
+ * gravado em disco: o sistema lê os elementos ao iniciar e grava a cada
+ * alteração.
  */
 public class BancoDeDados {
 

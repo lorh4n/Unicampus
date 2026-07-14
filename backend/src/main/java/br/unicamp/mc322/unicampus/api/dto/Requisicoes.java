@@ -5,7 +5,7 @@ import br.unicamp.mc322.unicampus.dominio.academico.Cor;
 import java.util.List;
 
 /**
- * Corpos de requisição aceitos pela API — espelham os payloads definidos em
+ * Corpos de requisição aceitos pela API, espelhando os payloads definidos em
  * {@code frontend/src/models/index.ts} e {@code data/repositories/types.ts}.
  */
 public final class Requisicoes {

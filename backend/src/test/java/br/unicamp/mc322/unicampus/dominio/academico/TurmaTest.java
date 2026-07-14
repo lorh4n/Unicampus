@@ -86,7 +86,7 @@ class TurmaTest {
     @DisplayName("GeradorDeAlerta: perto do limite de faltas gera NotificacaoFalta")
     void alertaDeFalta() {
         Matricula m = turma.matricular(marina, Cor.AZUL);
-        // limite = 8 (60h); com 6 faltas restam 2 → deve alertar
+        // limite = 8 (60h); com 6 faltas restam 2, deve alertar
         for (int i = 0; i < 6; i++) {
             turma.registrarFalta(m.getId());
         }

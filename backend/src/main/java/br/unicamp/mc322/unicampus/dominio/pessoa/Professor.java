@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Especialização de {@link Pessoa} que IMPLEMENTA a interface {@link Avaliavel}:
+ * Especialização de {@link Pessoa} que implementa {@link Avaliavel}:
  * recebe avaliações dos alunos e recalcula seu placar de forma incremental.
  * O professor define o PDD (critérios de avaliação) das próprias turmas e é o
  * único que lança nota/falta dos alunos matriculados nelas.

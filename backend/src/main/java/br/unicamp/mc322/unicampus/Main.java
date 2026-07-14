@@ -6,13 +6,13 @@ import br.unicamp.mc322.unicampus.persistencia.BancoDeDados;
 import java.nio.file.Path;
 
 /**
- * Unicampus — backend do trabalho final de MC322 (gestão acadêmica).
+ * Unicampus: backend do trabalho final de MC322 (gestão acadêmica).
  *
- * Sobe o servidor HTTP (padrão: porta 8080) com os dados persistidos em
- * arquivos JSON (padrão: ./data — criado com carga de demonstração na
+ * Sobe o servidor HTTP (porta 8080 por padrão) com os dados persistidos em
+ * arquivos JSON (diretório ./data, criado com carga de demonstração na
  * primeira execução). Configurável por variáveis de ambiente:
- *   PORT                — porta HTTP
- *   UNICAMPUS_DATA_DIR  — diretório dos arquivos de dados
+ *   PORT                - porta HTTP
+ *   UNICAMPUS_DATA_DIR  - diretório dos arquivos de dados
  *
  * Para ligar o frontend: defina VITE_API_URL=http://localhost:8080/api
  * no frontend/.env (ver frontend/README.md).

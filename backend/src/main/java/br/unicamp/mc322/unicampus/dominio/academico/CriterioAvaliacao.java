@@ -2,9 +2,9 @@ package br.unicamp.mc322.unicampus.dominio.academico;
 
 /**
  * Um critério do PDD de uma turma ({@code GradeCriterion} no contrato):
- * rótulo + peso (0..100). Os campos {@code grade}/{@code done} existem para o
- * PDD "de referência" da turma; a nota de cada aluno vive na {@link Matricula}.
- * COMPOSIÇÃO: um critério não existe fora da sua turma.
+ * rótulo e peso (0..100). Os campos {@code grade}/{@code done} existem para o
+ * PDD "de referência" da turma; a nota de cada aluno fica na {@link Matricula}.
+ * Um critério não existe fora da sua turma.
  */
 public class CriterioAvaliacao {
 

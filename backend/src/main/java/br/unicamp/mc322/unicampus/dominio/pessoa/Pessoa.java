@@ -5,12 +5,11 @@ import br.unicamp.mc322.unicampus.persistencia.Visoes;
 import com.fasterxml.jackson.annotation.JsonView;
 
 /**
- * CLASSE ABSTRATA (requisito do enunciado) — generalização de todo usuário do
- * sistema. As especializações {@link Aluno}, {@link Professor} e
- * {@link Coordenador} herdam identificação/credenciais e implementam de forma
- * POLIMÓRFICA {@link #getPapel()} e {@link #montarPerfilSessao()}: o mesmo
- * endpoint de login trata qualquer {@code Pessoa} sem precisar saber o tipo
- * concreto.
+ * Generalização de todo usuário do sistema. As especializações
+ * {@link Aluno}, {@link Professor} e {@link Coordenador} herdam identificação
+ * e credenciais e implementam {@link #getPapel()} e
+ * {@link #montarPerfilSessao()}, de modo que o endpoint de login trata
+ * qualquer {@code Pessoa} sem precisar saber o tipo concreto.
  */
 public abstract class Pessoa implements Identificavel {
 

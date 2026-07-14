@@ -6,9 +6,9 @@ import java.util.Map;
 
 /**
  * Matrícula de um aluno em uma turma ({@code RosterEntry} no contrato).
- * COMPOSIÇÃO: só existe dentro de uma {@link Turma} — guarda as notas lançadas
- * pelo professor (criterionId → nota), as faltas oficiais e os dados que são
- * preferência do aluno (cor de identificação e contador pessoal de faltas).
+ * Só existe dentro de uma {@link Turma}: guarda as notas lançadas pelo
+ * professor, as faltas oficiais e os dados que são preferência do aluno
+ * (cor de identificação e contador pessoal de faltas).
  */
 public class Matricula {
 

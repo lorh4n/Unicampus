@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Casos de uso do ALUNO. Ponto central do modelo: a "disciplina do aluno"
- * ({@code Course} no frontend) NÃO é uma entidade própria — é uma VISÃO
- * derivada da {@link Turma} em que ele está matriculado (fonte única de
- * verdade: as notas/faltas que o professor lança são as que o aluno vê).
+ * Casos de uso do aluno. A "disciplina do aluno" ({@code Course} no
+ * frontend) não é uma entidade própria: é uma visão derivada da {@link Turma}
+ * em que ele está matriculado, então as notas e faltas que o professor lança
+ * são as que o aluno vê.
  */
 public class ServicoAluno {
 

@@ -10,12 +10,11 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 
 /**
- * CLASSE ABSTRATA (requisito do enunciado) — generalização das notificações do
- * sistema. As subclasses ({@link NotificacaoFalta}, {@link NotificacaoNota},
- * {@link NotificacaoPrazo}, {@link NotificacaoSistema}) sabem montar o próprio
- * título/descrição e o campo {@code kind} do JSON sai POLIMORFICAMENTE do tipo
- * concreto (via {@code @JsonTypeInfo}) — bate com {@code NotificationKind} do
- * frontend.
+ * Generalização das notificações do sistema. As subclasses
+ * ({@link NotificacaoFalta}, {@link NotificacaoNota}, {@link NotificacaoPrazo},
+ * {@link NotificacaoSistema}) montam o próprio título/descrição, e o campo
+ * {@code kind} do JSON sai do tipo concreto (via {@code @JsonTypeInfo}),
+ * batendo com {@code NotificationKind} do frontend.
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "kind")
 @JsonSubTypes({
@@ -49,7 +48,7 @@ public abstract class Notificacao implements Identificavel {
 
     /**
      * Tipo da notificação no contrato do frontend ({@code NotificationKind}).
-     * Cada subclasse responde o seu — POLIMORFISMO — e o mesmo valor serve de
+     * Cada subclasse responde o seu, e o mesmo valor serve de
      * discriminador na desserialização (via {@code @JsonSubTypes}).
      */
     @JsonProperty("kind")

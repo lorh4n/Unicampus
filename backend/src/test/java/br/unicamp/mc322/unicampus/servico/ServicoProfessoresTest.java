@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/** Permissão de avaliação (§4.4): só avalia quem está cursando com o professor. */
+/** Permissão de avaliação: só avalia quem está cursando com o professor. */
 class ServicoProfessoresTest {
 
     @TempDir
