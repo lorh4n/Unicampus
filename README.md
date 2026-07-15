@@ -14,6 +14,8 @@ App de gestão acadêmica da Unicamp com três papéis — **Aluno**, **Professo
 
 ## 🎬 Demo
 
+Voce pode acessar em: https://unicampus-six.vercel.app/#/entrar
+
 <p align="center">
   <img src="docs/media/teaser.gif" alt="Trailer: login com RA e dashboard da aluna" width="840" />
 </p>
