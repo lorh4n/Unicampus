@@ -42,6 +42,18 @@ App de gestão acadêmica da Unicamp com três papéis — **Aluno**, **Professo
 
 ## Rodando o sistema completo
 
+### Pré-requisitos
+
+| Parte | Requisito | Observação |
+|---|---|---|
+| **Backend** | **JDK 17+** (Java 17) | Único requisito. O **Gradle não precisa ser instalado** — o wrapper `./gradlew` baixa a versão certa (9.4.1) na primeira execução. Deixe a **porta 8080** livre. |
+| **Frontend** | **Node.js 18+** (recomendado 20 LTS) e **npm** | Vem com o Node. Deixe a **porta 5173** livre. |
+
+Verifique com `java -version` (deve mostrar 17 ou superior) e `node -v` (18 ou superior).
+No Windows use `gradlew.bat run` no lugar de `./gradlew run`.
+
+### Passos
+
 ```bash
 # 1. Backend (http://localhost:8080/api)
 cd backend && ./gradlew run
@@ -52,6 +64,8 @@ echo 'VITE_API_URL=http://localhost:8080/api' > .env
 npm install && npm run dev
 ```
 
+Depois abra **http://localhost:5173** no navegador.
+
 Contas de demonstração (senha `123456`): aluna `247195` · professora `000101` ·
 coordenação `000042`. Sem o `.env`, o frontend roda sozinho em modo mock.
 
@@ -61,6 +75,284 @@ Documentação: [`frontend/README.md`](frontend/README.md) (interface e contrato
 [`backend/docs/`](backend/docs/) (diagramas UML).
 
 ## 🏗️ Arquitetura Orientada a Objetos (Backend)
+
+### Diagrama de classes (UML)
+
+Renderiza direto aqui no GitHub. A versão PlantUML (para o relatório) está em
+[`backend/docs/diagrama-classes.puml`](backend/docs/diagrama-classes.puml).
+
+#### Domínio — pessoas, turmas e avaliação
+
+```mermaid
+classDiagram
+    direction TB
+
+    class Identificavel {
+        <<interface>>
+        +getId() String
+    }
+
+    class Pessoa {
+        <<abstract>>
+        -id: String
+        -name: String
+        -email: String
+        -ra: String
+        -senha: String
+        +getPapel()* Papel
+        +montarPerfilSessao()* PerfilSessao
+        +senhaConfere(tentativa) boolean
+    }
+
+    class Aluno {
+        -course: String
+        -semester: String
+        -cr: double
+        -cp: double
+        -creditsCompleted: int
+        +getPapel() Papel
+        +montarPerfilSessao() PerfilSessao
+    }
+
+    class Professor {
+        -department: String
+        -scores: ScoreProfessor
+        -history: List~TurmaLecionada~
+        +receberAvaliacao(avaliacao)
+        +notaGeral() double
+    }
+
+    class Coordenador {
+        -title: String
+        -department: String
+    }
+
+    class Avaliavel {
+        <<interface>>
+        +receberAvaliacao(avaliacao)
+        +notaGeral() double
+    }
+
+    class ScoreProfessor {
+        -didactics: double
+        -organization: double
+        -accessibility: double
+        -material: double
+        -overall: double
+        -ratingsCount: int
+        +incorporar(avaliacao)
+    }
+
+    class GeradorDeAlerta {
+        <<interface>>
+        +gerarAlertas() List~Notificacao~
+    }
+
+    class Disciplina {
+        -code: String
+        -name: String
+        -area: String
+        -credits: int
+        -color: Cor
+        -status: StatusOferta
+        +cargaHoraria() int
+    }
+
+    class Turma {
+        -courseCode: String
+        -className: String
+        -professorId: String
+        -totalHours: int
+        -absenceLimit: int
+        -status: StatusOferta
+        +definirCriterios(criterios)
+        +lancarNota(matriculaId, criterioId, nota)
+        +registrarFalta(matriculaId)
+        +matricular(aluno, cor) Matricula
+        +mediaDoAluno(matricula) Double
+        +gerarAlertas() List~Notificacao~
+    }
+
+    class Matricula {
+        -studentId: String
+        -grades: Map~String,Double~
+        -absences: int
+        -selfAbsences: int
+        -color: Cor
+        +lancarNota(criterioId, nota)
+        +registrarFalta()
+    }
+
+    class CriterioAvaliacao {
+        -label: String
+        -weight: int
+        -grade: Double
+        -done: boolean
+        +comNotaDoAluno(nota) CriterioAvaliacao
+    }
+
+    class HorarioAula {
+        <<record>>
+        +weekday: int
+        +start: String
+        +end: String
+        +room: String
+    }
+
+    class RegrasAcademicas {
+        <<utility>>
+        +mediaPonderada(criterios, notas)$ Double
+        +notaNecessaria(criterios, notas)$ Double
+        +mediaIncremental(media, total, nota)$ double
+        +limiteDeFaltas(cargaHoraria)$ int
+        +reprovadoPorFrequencia(faltas, limite)$ boolean
+    }
+
+    Identificavel <|.. Pessoa
+    Identificavel <|.. Turma
+    Identificavel <|.. Disciplina
+
+    Pessoa <|-- Aluno : herança
+    Pessoa <|-- Professor
+    Pessoa <|-- Coordenador
+    Avaliavel <|.. Professor : implementa
+    Professor *-- ScoreProfessor : composição
+
+    GeradorDeAlerta <|.. Turma : implementa
+    Disciplina o-- Turma : agregação (1..*)
+    Turma *-- Matricula : composição (roster)
+    Turma *-- CriterioAvaliacao : composição (PDD)
+    Turma *-- HorarioAula
+    Aluno ..> Matricula : origina
+    Turma ..> RegrasAcademicas : usa
+```
+
+#### Notificações (polimorfismo) e exceções
+
+```mermaid
+classDiagram
+    direction TB
+
+    class Notificacao {
+        <<abstract>>
+        -id: String
+        -ownerId: String
+        -title: String
+        -desc: String
+        -read: boolean
+        -createdAt: long
+        +getKind()* String
+        +getGroup() String
+        +getTime() String
+        +alternarLida()
+    }
+
+    class NotificacaoFalta {
+        +getKind() "falta"
+    }
+    class NotificacaoNota {
+        +getKind() "nota"
+    }
+    class NotificacaoPrazo {
+        +getKind() "prazo"
+    }
+    class NotificacaoSistema {
+        +getKind() "sistema"
+    }
+
+    Notificacao <|-- NotificacaoFalta
+    Notificacao <|-- NotificacaoNota
+    Notificacao <|-- NotificacaoPrazo
+    Notificacao <|-- NotificacaoSistema
+
+    class UnicampusException {
+        -statusHttp: int
+        +getStatusHttp() int
+    }
+    class ValidacaoException {
+        400
+    }
+    class PesoInvalidoException {
+        400 — PDD não soma 100%
+    }
+    class AvaliacaoNaoPermitidaException {
+        403 — aluno não cursa com o professor
+    }
+    class MatriculaNaoEncontradaException {
+        404
+    }
+    class AutenticacaoException {
+        401
+    }
+    class AcessoNegadoException {
+        403
+    }
+    class RecursoNaoEncontradoException {
+        404
+    }
+
+    RuntimeException <|-- UnicampusException
+    UnicampusException <|-- ValidacaoException
+    ValidacaoException <|-- PesoInvalidoException
+    UnicampusException <|-- AvaliacaoNaoPermitidaException
+    UnicampusException <|-- MatriculaNaoEncontradaException
+    UnicampusException <|-- AutenticacaoException
+    UnicampusException <|-- AcessoNegadoException
+    UnicampusException <|-- RecursoNaoEncontradoException
+```
+
+#### Persistência e camadas
+
+```mermaid
+classDiagram
+    direction LR
+
+    class Repositorio~T~ {
+        <<interface>>
+        +listar() List~T~
+        +buscarPorId(id) Optional~T~
+        +filtrar(criterio) List~T~
+        +adicionar(entidade)
+        +remover(id)
+        +persistir()
+    }
+
+    class RepositorioJson~T~ {
+        -arquivo: Path
+        -cache: List~T~
+        lê o arquivo no construtor;
+        regrava a cada mutação
+    }
+
+    class BancoDeDados {
+        +alunos() Repositorio~Aluno~
+        +professores() Repositorio~Professor~
+        +turmas() Repositorio~Turma~
+        +disciplinas() Repositorio~Disciplina~
+        +notificacoes() Repositorio~Notificacao~
+    }
+
+    class ApiServer {
+        rotas Javalin /api/*
+        token Bearer + papel
+        exceção → status HTTP
+    }
+
+    class Servicos {
+        ServicoAutenticacao
+        ServicoAluno
+        ServicoAdmin
+        ServicoProfessorPortal
+        ServicoProfessores
+        ServicoBusca
+        ServicoNotificacoes
+    }
+
+    Repositorio <|.. RepositorioJson
+    BancoDeDados *-- RepositorioJson : um arquivo JSON por coleção
+    ApiServer --> Servicos : delega
+    Servicos --> BancoDeDados : consulta e persiste
+```
 
 O backend é organizado em pacotes com responsabilidades bem definidas:
 
@@ -109,11 +401,18 @@ Evita duplicar código entre classes de mesma natureza, modela a relação "é u
 **Associação** — `Turma` ↔ `List<CriterioAvaliacao>`/`List<Matricula>`; `Professor` ↔ `List<TurmaLecionada>`;
 `Disciplina`/`Matricula` ↔ `Cor`.
 
-**Agregação** — `Turma` agrega `Matricula`s (remover a turma não apaga o aluno, só a associação) e
-`CriterioAvaliacao`s (reutilizáveis fora do contexto de uma turma).
+**Agregação** — `Disciplina` agrega `Turma`s: a disciplina existe no catálogo independente de ter
+turma no semestre, e uma turma referencia a disciplina sem ser "destruída" com ela.
 
-**Composição** — não há exemplo forte no projeto atual; `CriterioAvaliacao` e `Matricula` são gerenciados
-como listas/mapas, o que caracteriza agregação, não composição estrita.
+**Composição** — partes que só existem dentro do todo e são criadas por ele:
+
+- `Professor` **compõe** `ScoreProfessor` — criado no construtor (`ScoreProfessor.inicial()`) e sem vida
+  fora do professor.
+- `Turma` **compõe** seu `roster` de `Matricula`, os `CriterioAvaliacao` do PDD e os `HorarioAula` —
+  todos criados pela própria `Turma` (`Matricula.nova(...)`) e sem sentido fora dela.
+- `BancoDeDados` **compõe** os `RepositorioJson` (um por coleção), instanciados no seu construtor.
+
+No diagrama de classes acima essas relações aparecem como `*--`.
 
 ### Encapsulamento
 
@@ -129,12 +428,18 @@ Atributos de domínio são `private`, com acesso controlado por getters/setters 
 
 | Exceção | HTTP | Uso |
 |---|---|---|
-| `UnicampusException` | — | Base de todas as exceções de negócio |
+| `UnicampusException` | — | Base de todas as exceções de negócio (guarda o status HTTP) |
 | `ValidacaoException` | 400 | Erros de validação de entrada |
-| `PesoInvalidoException` | 400 | Soma dos pesos dos critérios ≠ 100% |
-| `MatriculaNaoEncontradaException` | 404 | Matrícula não encontrada |
+| `PesoInvalidoException` | 400 | Soma dos pesos dos critérios (PDD) ≠ 100% |
+| `AvaliacaoNaoPermitidaException` | 403 | Aluno tenta avaliar professor de quem não cursa |
+| `MatriculaNaoEncontradaException` | 404 | Matrícula não encontrada na turma |
+| `AutenticacaoException` | 401 | Token ausente/expirado ou credenciais inválidas |
+| `AcessoNegadoException` | 403 | Papel sem permissão para a operação |
+| `RecursoNaoEncontradoException` | 404 | Entidade inexistente |
 
-Usadas em `Turma.definirCriterios()`, `Turma.lancarNota()` e `Turma.matriculaPorId()`.
+Todas herdam de `UnicampusException`, que carrega o status HTTP — o `ApiServer` traduz a exceção
+para a resposta correta num único ponto. Usadas em `Turma.definirCriterios()`, `Turma.lancarNota()`,
+`Turma.matriculaPorId()` e na camada de autenticação/autorização.
 
 ### Persistência
 
@@ -162,9 +467,9 @@ Usadas em `Turma.definirCriterios()`, `Turma.lancarNota()` e `Turma.matriculaPor
 | Interfaces | `Identificavel`, `GeradorDeAlerta`, `Avaliavel`, `Repositorio` |
 | Classes abstratas | `Pessoa`, `Notificacao` |
 | Polimorfismo | `getPapel()`, `getId()`, `gerarAlertas()`, `receberAvaliacao()` |
-| Associação | `Turma`–`CriterioAvaliacao`/`Matricula`, `Professor`–`TurmaLecionada`, `Disciplina`/`Matricula`–`Cor` |
-| Agregação | `Turma` agregando `Matricula` e `CriterioAvaliacao` |
-| Composição | Não implementada de forma estrita neste projeto |
+| Associação | `Professor`–`TurmaLecionada`, `Disciplina`/`Matricula`–`Cor`, `Turma`–`professorId` |
+| Agregação | `Disciplina` agregando `Turma`s |
+| Composição | `Professor`→`ScoreProfessor`, `Turma`→`Matricula`/`CriterioAvaliacao`/`HorarioAula`, `BancoDeDados`→`RepositorioJson` |
 | Exceções | `UnicampusException`, `ValidacaoException`, `PesoInvalidoException`, `MatriculaNaoEncontradaException` |
 | Persistência em arquivo | `RepositorioJson` + Jackson, formato JSON |
 | Interface gráfica | React/TypeScript (frontend), fora do escopo desta seção |
