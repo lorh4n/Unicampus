@@ -1,9 +1,39 @@
+import type { CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PrimaryButton } from '../components/common/PrimaryButton';
 import { ListSkeleton } from '../components/common/Skeleton';
-import { IconBack, IconCheck, IconEye } from '../components/icons';
+import { IconBack, IconEye } from '../components/icons';
 import { useToast } from '../context/ToastContext';
 import { useSignupViewModel } from '../viewmodels/useSignupViewModel';
+
+/** Botão de estado (Cursando / Já concluí) usado em cada disciplina. */
+function StateButton({
+  label,
+  active,
+  activeStyle,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  activeStyle: CSSProperties;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className="pressable"
+      aria-pressed={active}
+      onClick={onClick}
+      style={{
+        border: 'none', borderRadius: 10, padding: '8px 13px', fontSize: 12.5, fontWeight: 800,
+        cursor: 'pointer',
+        ...(active ? activeStyle : { background: '#f1f1f4', color: '#56565e' }),
+      }}
+    >
+      {label}
+    </button>
+  );
+}
 
 export function Signup() {
   const navigate = useNavigate();
@@ -98,21 +128,39 @@ export function Signup() {
           </div>
 
           <div>
-            <div style={{ fontSize: 16, fontWeight: 800, color: '#16153a' }}>Disciplinas de 2026.1</div>
+            <div style={{ fontSize: 16, fontWeight: 800, color: '#16153a' }}>Suas disciplinas</div>
             <div style={{ fontSize: 12.5, color: '#8e8e98', fontWeight: 500, marginTop: 1 }}>
-              Toque nas matérias que você cursa
+              Marque o que você <b>cursa</b> em 2026.1 e o que já <b>concluiu</b> (com a nota).
+              Calouro? Marque só as que vai cursar.
             </div>
           </div>
-          <div
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6, background: '#16153a',
-              borderRadius: 20, padding: '6px 13px', margin: '10px 0 14px',
-            }}
-          >
-            <span style={{ fontSize: 13, fontWeight: 800, color: '#FFC524' }}>{vm.selectedCount}</span>
-            <span style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>
-              selecionadas · {vm.selectedCredits} créditos
-            </span>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, margin: '10px 0 14px' }}>
+            <div
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6, background: '#16153a',
+                borderRadius: 20, padding: '6px 13px',
+              }}
+            >
+              <span style={{ fontSize: 13, fontWeight: 800, color: '#FFC524' }}>{vm.selectedCount}</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>
+                cursando · {vm.selectedCredits} cr
+              </span>
+            </div>
+            {vm.completedCount > 0 && (
+              <div
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8, background: '#E6F7F2',
+                  borderRadius: 20, padding: '6px 13px',
+                }}
+              >
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#0F8A6E' }}>
+                  {vm.completedCount} concluídas
+                </span>
+                <span style={{ fontSize: 12, fontWeight: 800, color: '#0F8A6E' }}>
+                  CP {vm.previewCp.toFixed(2)}{vm.previewCr > 0 ? ` · CR ${vm.previewCr.toFixed(1)}` : ''}
+                </span>
+              </div>
+            )}
           </div>
 
           {vm.offeringsLoading ? (
@@ -120,41 +168,64 @@ export function Signup() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
               {vm.offerings.map((o) => {
-                const on = vm.isSelected(o.code);
+                const state = vm.stateOf(o.code);
+                const enrolled = state === 'enrolled';
+                const done = state === 'completed';
                 return (
                   <div
                     key={o.code}
-                    className="pressable-row float-in"
-                    role="button"
-                    aria-pressed={on}
-                    onClick={() => vm.toggle(o.code)}
+                    className="float-in"
                     style={{
-                      display: 'flex', alignItems: 'center', gap: 11, padding: 13, borderRadius: 16,
-                      ...(on
+                      padding: 13, borderRadius: 16,
+                      ...(enrolled
                         ? {
                             background: 'linear-gradient(150deg,#F2762E,#FF9D4D)', color: '#fff',
                             border: '1.5px solid transparent', boxShadow: '0 8px 18px rgba(242,118,46,0.28)',
                           }
-                        : { background: '#fff', color: '#16153a', border: '1.5px solid #e4e4ea' }),
+                        : done
+                          ? { background: '#EAF9F4', color: '#16153a', border: '1.5px solid #9BE0CB' }
+                          : { background: '#fff', color: '#16153a', border: '1.5px solid #e4e4ea' }),
                     }}
                   >
-                    {on ? (
-                      <div
-                        style={{
-                          width: 24, height: 24, borderRadius: 8, background: 'rgba(255,255,255,0.25)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none',
-                        }}
-                      >
-                        <IconCheck size={14} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 14.5, fontWeight: 800, letterSpacing: '-0.01em' }}>{o.code}</div>
+                        <div style={{ fontSize: 11.5, fontWeight: 500, opacity: 0.72, lineHeight: 1.2 }}>{o.name}</div>
                       </div>
-                    ) : (
-                      <div style={{ width: 24, height: 24, borderRadius: 8, border: '1.8px solid #d6d6de', flex: 'none' }} />
-                    )}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 14.5, fontWeight: 800, letterSpacing: '-0.01em' }}>{o.code}</div>
-                      <div style={{ fontSize: 11.5, fontWeight: 500, opacity: 0.72, lineHeight: 1.2 }}>{o.name}</div>
+                      <span style={{ fontSize: 11.5, fontWeight: 700, opacity: 0.75, flex: 'none' }}>{o.credits} cr</span>
                     </div>
-                    <span style={{ fontSize: 12, fontWeight: 700, opacity: 0.8, flex: 'none' }}>{o.credits} cr</span>
+
+                    <div style={{ display: 'flex', gap: 7, marginTop: 11 }}>
+                      <StateButton
+                        label="Cursando"
+                        active={enrolled}
+                        activeStyle={{ background: 'rgba(255,255,255,0.24)', color: '#fff' }}
+                        onClick={() => (enrolled ? vm.clearState(o.code) : vm.setEnrolledState(o.code))}
+                      />
+                      <StateButton
+                        label="Já concluí"
+                        active={done}
+                        activeStyle={{ background: '#12B886', color: '#fff' }}
+                        onClick={() => (done ? vm.clearState(o.code) : vm.setCompletedState(o.code))}
+                      />
+                      {done && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: '#0F8A6E' }}>Nota</span>
+                          <input
+                            className="input"
+                            inputMode="decimal"
+                            value={vm.gradeOf(o.code)}
+                            placeholder="0–10"
+                            aria-label={`Nota de ${o.code}`}
+                            onChange={(e) => {
+                              const v = e.target.value.replace(',', '.').replace(/[^\d.]/g, '');
+                              vm.setGrade(o.code, v);
+                            }}
+                            style={{ width: 66, height: 38, padding: '0 10px', fontWeight: 800, textAlign: 'center' }}
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -162,6 +233,11 @@ export function Signup() {
           )}
         </div>
 
+        {vm.gradeMissing && !vm.error && (
+          <div style={{ fontSize: 12.5, fontWeight: 600, color: '#F2762E', marginTop: 14 }}>
+            Preencha a nota (0–10) de cada matéria marcada como concluída.
+          </div>
+        )}
         {vm.error && (
           <div style={{ fontSize: 12.5, fontWeight: 600, color: '#FF5A4D', marginTop: 14 }}>{vm.error}</div>
         )}

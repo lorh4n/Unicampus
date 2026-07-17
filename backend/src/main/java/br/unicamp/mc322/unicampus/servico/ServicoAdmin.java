@@ -20,7 +20,9 @@ import br.unicamp.mc322.unicampus.persistencia.Seed;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -50,18 +52,25 @@ public class ServicoAdmin {
                 t.getRoster().forEach(m -> alunosMatriculados.add(m.getStudentId())));
         int professores = banco.professores().total();
 
+        // Sem badge de variação: não há histórico entre semestres para computar
+        // um delta real, então não inventamos um número.
         List<Respostas.VisaoGeral.Cartao> cards = List.of(
-                new Respostas.VisaoGeral.Cartao("Disciplinas ativas", String.valueOf(disciplinasAtivas), "+4", "disciplinas"),
-                new Respostas.VisaoGeral.Cartao("Turmas no semestre", String.valueOf(turmas), "+2", "turmas"),
-                new Respostas.VisaoGeral.Cartao("Alunos matriculados", String.valueOf(alunosMatriculados.size()), "+3", "alunos"),
-                new Respostas.VisaoGeral.Cartao("Professores", String.valueOf(professores), "+0", "professores"));
+                new Respostas.VisaoGeral.Cartao("Disciplinas ativas", String.valueOf(disciplinasAtivas), "", "disciplinas"),
+                new Respostas.VisaoGeral.Cartao("Turmas no semestre", String.valueOf(turmas), "", "turmas"),
+                new Respostas.VisaoGeral.Cartao("Alunos matriculados", String.valueOf(alunosMatriculados.size()), "", "alunos"),
+                new Respostas.VisaoGeral.Cartao("Professores", String.valueOf(professores), "", "professores"));
 
-        List<Respostas.VisaoGeral.PeriodoMatricula> grafico = List.of(
-                new Respostas.VisaoGeral.PeriodoMatricula("24.1", "2.9k", 2900),
-                new Respostas.VisaoGeral.PeriodoMatricula("24.2", "3.1k", 3100),
-                new Respostas.VisaoGeral.PeriodoMatricula("25.1", "3.3k", 3300),
-                new Respostas.VisaoGeral.PeriodoMatricula("25.2", "3.5k", 3500),
-                new Respostas.VisaoGeral.PeriodoMatricula("26.1", "3.8k", 3847));
+        // Matrículas por disciplina (real): soma o roster das turmas ativas de
+        // cada disciplina no semestre atual. As 6 com mais matrículas.
+        Map<String, Integer> matriculasPorCodigo = new LinkedHashMap<>();
+        banco.turmas().filtrar(t -> t.getStatus() == StatusOferta.ATIVA).forEach(t ->
+                matriculasPorCodigo.merge(t.getCourseCode(), t.getRoster().size(), Integer::sum));
+        List<Respostas.VisaoGeral.PeriodoMatricula> grafico = matriculasPorCodigo.entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .limit(6)
+                .map(e -> new Respostas.VisaoGeral.PeriodoMatricula(
+                        e.getKey(), String.valueOf(e.getValue()), e.getValue()))
+                .toList();
 
         List<Respostas.VisaoGeral.Atividade> atividade = banco.atividades().listar().stream()
                 .sorted(Comparator.comparingLong(AtividadeAdmin::getCreatedAt).reversed())

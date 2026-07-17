@@ -74,22 +74,23 @@ export function AdminOverview() {
       {/* stat cards */}
       <div className="admin-stat-grid">
         {vm.cards.map((card) => {
-          const noDelta = card.delta === '+0';
+          const hasDelta = card.delta.trim() !== '' && card.delta !== '+0';
           return (
             <div key={card.kind} className="admin-card" style={{ padding: 20 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ width: 42, height: 42, borderRadius: 13, background: CARD_ICON[card.kind].bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {CARD_ICON[card.kind].icon}
                 </div>
-                <span
-                  style={{
-                    fontSize: 12, fontWeight: 800, borderRadius: 8, padding: '3px 8px',
-                    color: noDelta ? '#8e8e98' : '#16A085',
-                    background: noDelta ? '#f1f1f4' : '#E6F7F2',
-                  }}
-                >
-                  {card.delta}
-                </span>
+                {hasDelta && (
+                  <span
+                    style={{
+                      fontSize: 12, fontWeight: 800, borderRadius: 8, padding: '3px 8px',
+                      color: '#16A085', background: '#E6F7F2',
+                    }}
+                  >
+                    {card.delta}
+                  </span>
+                )}
               </div>
               <div style={{ fontSize: 30, fontWeight: 800, letterSpacing: '-0.02em', marginTop: 14 }}>{card.value}</div>
               <div style={{ fontSize: 13, fontWeight: 600, color: '#8e8e98', marginTop: 1 }}>{card.label}</div>
@@ -103,8 +104,8 @@ export function AdminOverview() {
         <div className="admin-card" style={{ padding: 22 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-0.01em' }}>Matrículas por período</div>
-              <div style={{ fontSize: 12.5, fontWeight: 500, color: '#8e8e98', marginTop: 1 }}>Últimos 6 semestres</div>
+              <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-0.01em' }}>Matrículas por disciplina</div>
+              <div style={{ fontSize: 12.5, fontWeight: 500, color: '#8e8e98', marginTop: 1 }}>Turmas ativas do semestre</div>
             </div>
             <div style={{ background: '#f1f1f4', borderRadius: 10, padding: '7px 12px', fontSize: 12.5, fontWeight: 700, color: '#16153a' }}>
               2026.1

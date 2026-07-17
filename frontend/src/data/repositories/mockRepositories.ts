@@ -223,7 +223,29 @@ export const mockRepositories: Repositories = {
     },
     async signup(payload) {
       setToken('dev-token');
-      const s: Student = { ...SEED_STUDENT, name: payload.name, ra: payload.ra };
+      // Espelha o backend: CP = créditos concluídos ÷ exigidos; CR = média
+      // ponderada pelas notas das concluídas (0 se o aluno for calouro).
+      const creditsTotal = 188;
+      const creditsOf = (code: string) =>
+        SEED_OFFERINGS.find((o) => o.code === code)?.credits ?? 0;
+      const done = (payload.completed ?? []).map((c) => ({ ...c, credits: creditsOf(c.code) }));
+      const creditsCompleted = done.reduce((a, c) => a + c.credits, 0);
+      const cr = creditsCompleted > 0
+        ? Math.round((done.reduce((a, c) => a + c.grade * c.credits, 0) / creditsCompleted) * 10) / 10
+        : 0;
+      const cp = creditsCompleted > 0
+        ? Math.round((creditsCompleted / creditsTotal) * 100) / 100
+        : 0;
+      const s: Student = {
+        ...SEED_STUDENT,
+        name: payload.name,
+        ra: payload.ra,
+        cr,
+        crDelta: 0,
+        cp,
+        creditsCompleted,
+        creditsTotal,
+      };
       student.save(s);
       currentUser.set(s.id);
       return delay({ token: 'dev-token', student: s }, 500);

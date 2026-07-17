@@ -61,11 +61,40 @@ public class ServicoAutenticacao {
         if (senha.length() < 6) {
             throw new ValidacaoException("A senha precisa de pelo menos 6 caracteres");
         }
+        // Histórico informado no cadastro: soma créditos e calcula CR (média
+        // ponderada pelas notas) e CP (créditos concluídos ÷ exigidos). Um
+        // calouro não marca nada e nasce com CR/CP 0 — o que é correto.
+        int creditsTotal = 188;
+        int creditsCompleted = 0;
+        double somaPonderada = 0;
+        if (req.completed() != null) {
+            for (Requisicoes.Cadastro.Concluida c : req.completed()) {
+                if (c == null || c.code() == null) {
+                    continue;
+                }
+                if (c.grade() < 0 || c.grade() > 10) {
+                    throw new ValidacaoException("Nota de " + c.code() + " deve estar entre 0 e 10");
+                }
+                int creditos = creditosDaDisciplina(c.code());
+                if (creditos <= 0) {
+                    continue; // código desconhecido no catálogo — ignora
+                }
+                creditsCompleted += creditos;
+                somaPonderada += c.grade() * creditos;
+            }
+        }
+        double cr = creditsCompleted > 0
+                ? Math.round(somaPonderada / creditsCompleted * 10) / 10.0
+                : 0;
+        double cp = creditsCompleted > 0
+                ? Math.round((double) creditsCompleted / creditsTotal * 100) / 100.0
+                : 0;
+
         Aluno aluno = new Aluno(Ids.gerar("stu"), req.name().trim(),
                 "a" + ra + "@dac.unicamp.br",
                 ra, senha,
                 req.course() == null || req.course().isBlank() ? "Ciência da Computação" : req.course(),
-                "42", Seed.SEMESTRE_ATUAL, 0, 0, 0, 0, 188);
+                "42", Seed.SEMESTRE_ATUAL, cr, 0, cp, creditsCompleted, creditsTotal);
         banco.alunos().adicionar(aluno);
 
         if (req.enrolledCodes() != null) {
@@ -103,6 +132,16 @@ public class ServicoAutenticacao {
         String token = UUID.randomUUID().toString();
         sessoes.put(token, pessoa.getId());
         return new Respostas.Sessao(token, pessoa.montarPerfilSessao());
+    }
+
+    /** Créditos de uma disciplina do catálogo pelo código (0 se não existir). */
+    private int creditosDaDisciplina(String code) {
+        return banco.disciplinas()
+                .filtrar(d -> d.getCode().equalsIgnoreCase(code))
+                .stream()
+                .findFirst()
+                .map(d -> d.getCredits())
+                .orElse(0);
     }
 
     private Optional<Turma> primeiraTurmaAtiva(String courseCode) {

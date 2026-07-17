@@ -54,13 +54,18 @@ public class ApiServer {
         Javalin app = Javalin.create(config -> {
             config.showJavalinBanner = false;
             config.jsonMapper(new JavalinJackson().updateMapper(Mapeadores::configurarApi));
-            // CORS seguro: permite apenas a URL do frontend em produção ou o Vite local
+            // CORS seguro: sempre libera o Vite local e, em produção, cada host
+            // informado em FRONTEND_URL (aceita vários separados por vírgula).
             config.bundledPlugins.enableCors(cors -> cors.addRule(regra -> {
+                regra.allowHost("http://localhost:5173");
                 String frontendUrl = System.getenv("FRONTEND_URL");
                 if (frontendUrl != null && !frontendUrl.isBlank()) {
-                    regra.allowHost(frontendUrl);
-                } else {
-                    regra.allowHost("http://localhost:5173");
+                    for (String host : frontendUrl.split(",")) {
+                        String limpo = host.trim();
+                        if (!limpo.isEmpty()) {
+                            regra.allowHost(limpo);
+                        }
+                    }
                 }
             }));
         });

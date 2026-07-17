@@ -24,6 +24,12 @@ import type {
   UserRole,
 } from '../../models';
 
+/** Disciplina já concluída informada no cadastro (código + nota final 0–10). */
+export interface CompletedCourse {
+  code: string;
+  grade: number;
+}
+
 export interface SignupPayload {
   name: string;
   ra: string;
@@ -31,6 +37,8 @@ export interface SignupPayload {
   /** Senha escolhida no cadastro — obrigatória com o backend real. */
   password: string;
   enrolledCodes: string[];
+  /** Matérias já feitas — usadas para calcular CR e CP na criação da conta. */
+  completed: CompletedCourse[];
 }
 
 export interface LoginOptions {

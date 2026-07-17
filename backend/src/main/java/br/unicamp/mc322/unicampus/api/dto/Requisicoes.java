@@ -17,7 +17,11 @@ public final class Requisicoes {
     }
 
     public record Cadastro(String name, String ra, String course, String password,
-                           List<String> enrolledCodes) {
+                           List<String> enrolledCodes, List<Concluida> completed) {
+
+        /** Disciplina já cursada e sua nota final (0–10), informada no cadastro. */
+        public record Concluida(String code, double grade) {
+        }
     }
 
     public record ResetSenha(String ra) {
